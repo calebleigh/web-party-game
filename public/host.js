@@ -105,7 +105,7 @@ function renderLobby() {
   app.innerHTML = `
     <div class="host-shell">
       <div class="lobby-top">
-        <div class="host-title"><span class="logo cc-logo">${icon("couch", "couch-glyph")}<span class="cc-words">Couch <span class="cc-accent">Clash</span></span></span></div>
+        <div class="host-title"><span class="logo cc-logo"><span class="cc-couch"><span class="cc-couch-frame">${couchFrame()}</span><span class="cc-couch-word">Couch</span></span><span class="cc-accent">Clash</span></span></div>
         <div class="join-card">
           ${qr ? `<div class="join-qr">${qr}</div>` : ""}
           <div class="join-info">

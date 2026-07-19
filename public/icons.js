@@ -29,6 +29,18 @@ function icon(name, cls) {
   return `<svg class="ic ${cls || ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ""}</svg>`;
 }
 
+/* Wide couch outline that stretches to frame the word "Couch" in the logo.
+ * preserveAspectRatio="none" lets it fill any box; non-scaling-stroke keeps the
+ * line weight even when stretched wide. */
+function couchFrame() {
+  return `<svg class="couch-frame-svg" viewBox="0 0 100 60" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 30 V12 a6 6 0 0 1 6 -6 h52 a6 6 0 0 1 6 6 v18" vector-effect="non-scaling-stroke"/>
+    <path d="M6 50 v-14 a8 8 0 0 1 16 0 v4 h56 v-4 a8 8 0 0 1 16 0 v14 a3 3 0 0 1 -3 3 H9 a3 3 0 0 1 -3 -3 z" vector-effect="non-scaling-stroke"/>
+    <path d="M16 53 v5" vector-effect="non-scaling-stroke"/>
+    <path d="M84 53 v5" vector-effect="non-scaling-stroke"/>
+  </svg>`;
+}
+
 /* Numbered rank badge (gold/silver/bronze for top 3) — replaces medal emoji. */
 function rankBadge(i) {
   return `<span class="rank-badge r${i + 1 <= 3 ? i + 1 : "n"}">${i + 1}</span>`;
