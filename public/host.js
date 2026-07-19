@@ -313,6 +313,7 @@ function renderGame() {
       case "reflexRush": body = viewReflex(g); break;
       case "herdMentality": body = viewHerd(g); break;
       case "doodleDash": body = viewDoodle(g); break;
+      case "imposter": body = viewImposter(g); break;
       default: body = `<div class="center"><h2>Loading…</h2></div>`;
     }
   }
@@ -375,6 +376,55 @@ function finalScreen(lb) {
     <h1 style="font-size:3rem">${winnerHeadline(lb, "score")}</h1>
     ${leaderboardHTML(lb, "Final scores")}
     <button class="btn big teal" onclick="endGame()">Back to games</button>
+  </div>`;
+}
+
+/* ---------------- IMPOSTER ---------------- */
+function impNumbers(list, reveal) {
+  return `<div class="imp-numbers">${list.map((n) => `
+    <div class="imp-num ${reveal && n.isImposter ? "imp-is" : ""}">
+      <span class="avatar-dot" style="background:${n.color}"></span>
+      <span class="imp-name">${esc(n.name)}${reveal && n.isImposter ? " 🕵️" : ""}</span>
+      <span class="imp-val">${n.number != null ? n.number : "—"}</span>
+      ${reveal ? `<span class="imp-votes">${n.votes ? `${n.votes} vote${n.votes > 1 ? "s" : ""}` : ""}</span>` : ""}
+    </div>`).join("")}</div>`;
+}
+function viewImposter(g) {
+  if (g.screen === "final") return finalScreen(g.leaderboard);
+  const head = `<div style="display:flex;align-items:center;gap:20px">
+    <span class="pill">Round ${g.round}/${g.total}</span>
+    ${(g.screen === "answer" || g.screen === "vote") ? timerRing(g.timeLeft) : `<span class="pill" style="color:var(--red)">${icon("mask")}</span>`}
+    ${g.screen === "answer" ? `<span class="pill">${g.answered}/${g.players} answered</span>` : ""}
+    ${g.screen === "vote" ? `<span class="pill">${g.voted}/${g.players} voted</span>` : ""}
+  </div>`;
+  if (g.screen === "answer") {
+    return `${head}
+      <span style="color:var(--red)">${icon("mask", "status-ic")}</span>
+      <div class="big-prompt" style="font-size:2rem">Everyone's answering a secret question…</div>
+      <p class="muted">One of you is the Imposter — they only see a number range. Answer on your phone!</p>`;
+  }
+  if (g.screen === "vote") {
+    return `${head}
+      <div class="big-prompt">Who's the Imposter?</div>
+      ${impNumbers(g.numbers, false)}
+      <p class="muted">Talk it out — then vote on your phones for who's faking it.</p>`;
+  }
+  if (g.screen === "imposterGuess") {
+    return `<div class="center" style="gap:18px">
+      <span style="color:var(--red)">${icon("mask", "status-ic")}</span>
+      <h2>${esc(g.imposterName)} is guessing the secret question…</h2>
+      <p class="muted">Can the Imposter figure out what everyone was answering?</p></div>`;
+  }
+  const r = g.result;
+  return `<div class="center" style="min-height:auto;gap:14px">
+    <span style="color:var(--red)">${icon("mask", "status-ic")}</span>
+    <h1 style="font-size:2.2rem">The Imposter was ${esc(r.imposterName)}!</h1>
+    <p class="muted">The question was: <b>${esc(r.question)}</b></p>
+    ${impNumbers(r.numbers, true)}
+    <div class="pill" style="font-size:1.15rem">${r.caught
+      ? `Caught! ${r.caughtCount}/${r.insiderCount} spotted the imposter`
+      : `The Imposter escaped! Fooled ${r.fooled}/${r.insiderCount}`}${r.guessedRight ? " · guessed the question! +250" : ""}</div>
+    ${leaderboardHTML(g.leaderboard, "Scores")}
   </div>`;
 }
 

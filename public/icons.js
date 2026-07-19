@@ -23,6 +23,7 @@ const ICONS = {
   target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   couch: '<path d="M5 14V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M3 18v-4a2 2 0 0 1 4 0v1h10v-1a2 2 0 0 1 4 0v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M6 19v2"/><path d="M18 19v2"/>',
+  mask: '<path d="M3 8h18a1 1 0 0 1 1 1v2a5 5 0 0 1-5 5 4.5 4.5 0 0 1-3.6-1.9 1 1 0 0 0-1.6 0A4.5 4.5 0 0 1 8 16a5 5 0 0 1-5-5V9a1 1 0 0 1 1-1z"/><line x1="7" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/>',
 };
 
 function icon(name, cls) {
@@ -55,6 +56,7 @@ const GAME_ICONS = {
   reflexRush: "zap",
   herdMentality: "players",
   doodleDash: "pencil",
+  imposter: "mask",
 };
 const GAME_COLORS = {
   wordWaterfall: "var(--cyan)",
@@ -64,6 +66,7 @@ const GAME_COLORS = {
   reflexRush: "var(--green)",
   herdMentality: "var(--pink)",
   doodleDash: "var(--blue)",
+  imposter: "var(--red)",
 };
 
 /* FLIP animation: capture element positions before a re-render, then after the

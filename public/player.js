@@ -258,6 +258,7 @@ function gameBody() {
     case "reflexRush": return pReflex(g);
     case "herdMentality": return pHerd(g);
     case "doodleDash": return pDoodle(g);
+    case "imposter": return pImposter(g);
     default: return `<h2>Loading…</h2>`;
   }
 }
@@ -473,6 +474,51 @@ function pHerd(g) {
 window.sendHerd = () => {
   const el = document.getElementById("herd");
   if (el && el.value.trim()) act({ type: "answer", text: el.value });
+};
+
+/* ---------------- IMPOSTER ---------------- */
+function pImposter(g) {
+  if (g.screen === "final") return finalP(g);
+  if (g.screen === "answer") {
+    if (g.submitted) return waiting(g.isImposter ? "Bluff submitted — act natural!" : "Number locked in");
+    if (g.isImposter) {
+      return `<span style="color:var(--red)">${icon("mask", "status-ic")}</span>
+        <h2>You're the Imposter!</h2>
+        <p class="muted">You can't see the question. Enter a number that blends in.</p>
+        <p class="player-prompt">Believable range: <b>${esc(g.range)}</b></p>
+        <input class="field" id="impnum" type="number" inputmode="numeric" placeholder="your number" autocomplete="off" />
+        <button class="btn big pink" onclick="sendImpNumber()">Submit</button>`;
+    }
+    return `<p class="player-prompt">${esc(g.question)}</p>
+      <p class="muted">Answer honestly — with a number.</p>
+      <input class="field" id="impnum" type="number" inputmode="numeric" placeholder="your number" autocomplete="off" />
+      <button class="btn big teal" onclick="sendImpNumber()">Submit</button>`;
+  }
+  if (g.screen === "vote") {
+    if (g.myVote) return waiting("Vote cast — watch the big screen");
+    return `<p class="player-prompt">Who's the Imposter?</p>
+      <p class="muted">Your number was ${g.myNumber != null ? g.myNumber : "—"}. Vote for who's faking it.</p>
+      <div class="vote-list">${g.options.map((o) => `<button class="vote-item" onclick="act({type:'vote',target:'${o.id}'})"><span class="avatar-dot" style="background:${o.color}"></span> ${esc(o.name)}</button>`).join("")}</div>`;
+  }
+  if (g.screen === "imposterGuess") {
+    if (!g.isImposter) return waiting("The Imposter is guessing the question…");
+    if (g.guessed) return waiting("Guess locked in");
+    return `<span style="color:var(--red)">${icon("mask", "status-ic")}</span>
+      <h2>Quick — what was the question?</h2>
+      <p class="muted">Guess right for bonus points!</p>
+      <div class="vote-list">${(g.options || []).map((o, i) => `<button class="vote-item" onclick="act({type:'guessQuestion',i:${i}})">${esc(o)}</button>`).join("")}</div>`;
+  }
+  let col, ic, h;
+  if (g.wasImposter) { col = g.caught ? "var(--red)" : "var(--green)"; ic = "mask"; h = g.caught ? "You got caught!" : "You fooled them!"; }
+  else { col = g.votedImposter ? "var(--green)" : "var(--ink-soft)"; ic = g.votedImposter ? "check" : "x"; h = g.votedImposter ? "You caught the Imposter!" : "You got fooled…"; }
+  return `<span style="color:${col}">${icon(ic, "status-ic")}</span>
+    <h2>${esc(h)}</h2>
+    ${g.wasImposter && g.guessedRight ? `<p class="waiting-check">…and you guessed the question! Bonus!</p>` : ""}
+    <p class="muted">The question: &ldquo;${esc(g.question)}&rdquo;</p>`;
+}
+window.sendImpNumber = () => {
+  const el = document.getElementById("impnum");
+  if (el && el.value !== "") act({ type: "number", value: el.value });
 };
 
 /* ---------------- REFLEX ---------------- */
