@@ -62,6 +62,35 @@ const PROMPTS = [
   "A rejected emoji nobody asked for",
   "What the moon is secretly up to when nobody's looking",
 ];
+PROMPTS.push(
+  "A terrible name for a rollercoaster", "The worst thing to say on a first date", "A superpower that only works when you're asleep", "The real reason your socks disappear in the laundry", "A rejected flavor of toothpaste", "What your dog dreams about all day",
+  "The worst possible theme for a funeral", "A bad name for a new energy drink", "Something you should NOT say to a lifeguard", "The most useless feature on a new car", "A terrible slogan for an airline", "What your houseplant would say if it could talk",
+  "The worst gift to give a newborn baby", "A bad thing to hear your pilot say over the intercom", "A terrible name for a submarine", "The real reason the printer is always out of ink", "A terrible motivational quote for a Monday morning", "The worst thing to hear from your barber halfway through",
+  "A rejected name for a brand of dog food", "What your microwave is secretly plotting at midnight", "The most passive-aggressive way to sign off an email", "A terrible superhero whose power is being mildly inconvenient", "The real reason the traffic light turned red just for you", "A bad thing to say while giving a wedding speech",
+  "The worst possible name for a cat cafe", "A rejected slogan for a dentist's office", "What the crumbs at the bottom of the bag are dreaming of", "The worst way to answer 'how are you today'", "A terrible theme for a corporate retreat", "The real reason your phone dies at exactly 20 percent",
+  "A confusing thing to shout at a sporting event", "The worst souvenir to bring home from a museum", "A rejected button for the next TV remote", "What your washing machine judges you for owning", "The worst possible name for a mattress company", "A terrible piece of advice for a first-time babysitter",
+  "The real reason the coffee shop spelled your name wrong", "A bad name for a brand-new pizza chain", "The worst thing to find inside a birthday pinata", "A rejected exhibit at a very boring zoo", "What your shoes have been quietly putting up with", "The most useless thing to bring on a camping trip",
+  "A terrible catchphrase for a weather forecaster", "The worst way to start a public speech", "A rejected national holiday that got canceled", "What the office fridge has been hiding all week", "The worst thing to whisper during a museum tour", "A terrible name for a marching band made of toddlers",
+  "The real reason your online order took three weeks", "A bad opening line for a first phone call", "The worst possible mascot for a hospital", "A rejected competition for the county fair", "What your bicycle really thinks of your riding", "The worst thing to say to a barista before your coffee",
+  "A terrible name for a fancy chocolate", "The real reason dogs bark at the mail carrier", "A bad theme for a high school reunion", "The worst item to auction at a charity gala", "A rejected sound effect for a video game", "What the umbrella in the closet is waiting for",
+  "The worst thing to hear right before a rollercoaster starts", "A terrible name for a nature documentary", "The real reason your keys are never where you left them", "A superpower that only works underwater", "The most useless gadget sold on late-night TV", "A terrible slogan for a gym",
+  "What your smartwatch really thinks of your workout", "The worst gift to bring to a housewarming party", "A bad thing to say while judging a bake-off", "A terrible name for a lighthouse", "The real reason the escalator is always broken", "A rejected name for a brand of bottled water",
+  "What the leftovers in the back of the fridge are planning", "The most awkward thing to say in an elevator", "A terrible superhero who only saves the day on weekends", "The real reason your shoelaces come untied", "A bad thing to say while cutting someone's hair", "The worst possible name for a spa",
+  "A rejected slogan for a library", "What the single glove without a pair is hoping for", "The worst way to respond to 'we need to talk'", "A terrible theme for a baby shower", "The real reason your plant grew in exactly the wrong direction", "A confusing thing to announce over a store intercom",
+  "The worst thing to collect as a hobby", "A rejected setting on the office thermostat", "What your car keys do while you're asleep", "The worst possible name for a bakery", "A terrible piece of advice for a new pet owner", "The real reason the drive-thru always forgets your fries",
+  "A bad name for a brand-new theme park", "The worst thing to find in a box of assorted chocolates", "A rejected float in the town parade", "What your umbrella thinks every time it rains", "The most useless app on your phone", "A terrible catchphrase for a superhero cat",
+  "The worst way to end a voicemail", "A rejected month of the year", "What the tangled headphones in your pocket have been up to", "The worst thing to say during a moment of silence", "A terrible name for a knitting club for bikers", "The real reason your suitcase is always the last off the plane",
+  "A bad opening line for a customer service call", "The worst possible mascot for a library", "A rejected event for the Olympics", "What your left shoe secretly resents about your right shoe", "The worst thing to say to your hairdresser afterward", "A terrible name for a hot air balloon",
+  "The real reason your umbrella breaks the moment you open it", "A bad theme for a company picnic", "The worst item to sell in a hotel gift shop", "A rejected ringtone nobody wanted", "What the crumbs in your keyboard are living off of", "The worst thing to hear a flight attendant say",
+  "A terrible name for a farmer's market band", "The real reason the office coffee always tastes like that", "A superpower that only works when nobody is watching", "The most useless thing to keep in your junk drawer", "A terrible slogan for a shoe brand", "What your fitness tracker really wants to tell you",
+  "The worst gift to give a coworker on their last day", "A bad thing to say while narrating a wildlife show", "A terrible name for a ski resort", "The real reason your pen runs out mid-signature", "A rejected name for a new breakfast smoothie", "What the last French fry at the bottom of the bag fears",
+  "The most awkward thing to say to your neighbor", "A terrible superhero whose only weakness is stairs", "The real reason the microwave beeps one more time", "A bad thing to say while hosting a talent show", "The worst possible name for a submarine sandwich shop", "A rejected slogan for a mattress store",
+  "What the spare change in the couch is waiting for", "The worst way to introduce yourself at a party", "A terrible theme for a family game night", "The real reason your ice cream always drips on the good side", "A confusing thing to say to a tour guide", "The worst thing to keep in your car glovebox",
+  "A rejected feature for the next pair of headphones", "What your toaster is quietly judging you for", "The worst possible name for a fitness studio", "A terrible piece of advice for a first-time gardener", "The real reason your umbrella turns inside out", "A bad name for a brand-new candy bar",
+  "The worst thing to find floating in the community pool", "A rejected mascot for a cereal box", "What your welcome mat has silently endured", "The most useless thing to win at a carnival", "A terrible catchphrase for a talking GPS", "The worst way to answer a trivia question",
+  "A rejected day of the week", "What the missing puzzle piece has been doing all this time", "The worst thing to say during a group photo", "A terrible name for a polka band for teenagers", "The real reason the bus arrives the second you give up waiting", "A bad opening line for a wedding toast to strangers",
+  "The worst possible mascot for a dentist", "A rejected sport for the neighborhood field day", "What your phone charger really thinks of you", "The worst thing to say to a chef about their cooking", "A terrible name for a fancy candle", "The real reason your remote is always between the couch cushions"
+);
 
 // Classic mode: a deck of answer cards players hold in a hand (Apples-to-Apples style).
 const ANSWER_CARDS = [
@@ -80,6 +109,34 @@ const ANSWER_CARDS = [
   "A fortune cookie", "The Sunday scaries", "A piñata", "A garden gnome", "A screaming goat",
   "Two raccoons in a trench coat", "A haunted doll", "Warm potato salad",
 ];
+ANSWER_CARDS.push(
+  "A soggy french fry", "Gas station sushi", "A broken umbrella", "The office fridge smell", "A pigeon with attitude", "Uncle Larry at Thanksgiving",
+  "A screaming kettle", "Wet cardboard", "A clogged toilet", "The last piece of tape", "A three-legged chair", "Grandma's fruitcake",
+  "A malfunctioning robot", "The final boss", "A confused tourist", "Cold pizza for breakfast", "A sock with a hole", "The neighbor's rooster",
+  "A drunk uncle", "Slippery ice", "A stubborn mule", "The kids' table", "A half-eaten sandwich", "Burnt popcorn",
+  "A flat tire", "The Monday meeting", "A greasy handshake", "Dryer lint", "A lost sock", "The spare bedroom",
+  "A creaky floorboard", "Lukewarm coffee", "An angry squirrel", "The junk drawer", "A broken escalator", "Stale bread",
+  "A moody teenager", "The dollar store", "A tangled cord", "Overcooked broccoli", "A waterlogged phone", "The self-checkout line",
+  "A feral cat", "Melted ice cream", "A squeaky wheel", "The waiting room", "A dented can", "Soggy cereal",
+  "A lost puppy", "The parking meter", "A rusty bike", "Freezer burn", "A chatty barber", "The comment section",
+  "A limp handshake", "Cafeteria mystery stew", "A broken zipper", "The dentist's chair", "A howling wolf", "Warm soda",
+  "A stuck drawer", "The middle seat", "A napping cat", "Grocery store samples", "A stubbed toe", "The unread emails",
+  "A cracked screen", "Wilted lettuce", "A loud chewer", "The buffet line", "A persistent mosquito", "Damp towels",
+  "A slow walker", "The office gossip", "A tiny umbrella", "Chunky milk", "A spinning top", "The last parking spot",
+  "A clumsy waiter", "Runny eggs", "A stray cat", "The dentist's drill", "A sleepy sloth", "Cold french fries",
+  "A flickering light", "The snack aisle", "A grumpy cashier", "Soggy toast", "A wobbly table", "The complaint box",
+  "A hungry hippo", "Warm potato chips", "A tangled slinky", "The lost remote", "A barking chihuahua", "Deflated balloons",
+  "A fussy eater", "The airport delay", "A giant spider", "Cheap cologne", "A broken pencil", "The neighbor's leaf blower",
+  "A sassy parrot", "Melting popsicles", "A sticky doorknob", "The hold music", "A confused pigeon", "Room-temperature butter",
+  "A creepy mannequin", "The awkward hug", "A hyper puppy", "Burnt toast", "A leaky faucet", "The dentist's bill",
+  "A spooked horse", "Flat champagne", "A broken shoelace", "The customer service line", "A waddling penguin", "Soggy nachos",
+  "A ticking clock", "The endless meeting", "A sneezing cat", "Overripe bananas", "A squished bug", "The middle child",
+  "A fainting goat", "Cheap fireworks", "A limp noodle", "The gym locker room", "A cranky baby", "Spilled coffee",
+  "A one-eyed cat", "The lost luggage", "A chubby hamster", "Warm mayonnaise", "A spinning fan", "The dead battery",
+  "A sleepy bulldog", "Cold nachos", "A broken record", "The last chicken nugget", "A hissing snake", "Dusty attic",
+  "A stubborn cork", "The exit interview", "A waltzing bear", "Chunky peanut butter", "A drooling dog", "The porta-potty",
+  "A prancing pony", "Overinflated ego", "A chattering monkey", "The blue screen of death", "A spooky basement"
+);
 
 const ANSWER_MS = 45_000;
 const VOTE_MS = 30_000;
