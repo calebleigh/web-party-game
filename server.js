@@ -333,6 +333,16 @@ class GameController {
       gameLeaderboard: () => room.activePlayers()
         .map((p) => ({ id: p.id, name: p.name, color: p.color, score: this.ctx.gameScore(p.id) }))
         .sort((a, b) => b.score - a.score),
+      // Competition rank for a player by this-game score: tied players share a
+      // rank (two firsts -> both rank 1, next is rank 3). `tied` is true when at
+      // least one other active player has the same score.
+      gameRank: (id) => {
+        const actives = room.activePlayers();
+        const mine = this.ctx.gameScore(id);
+        const higher = actives.filter((p) => this.ctx.gameScore(p.id) > mine).length;
+        const same = actives.filter((p) => this.ctx.gameScore(p.id) === mine).length;
+        return { rank: higher + 1, total: actives.length, tied: same > 1 };
+      },
       after: (ms, fn) => room.setTimer(fn, ms),
       sync: () => room.sync(),
       syncHost: () => room.syncHost(),

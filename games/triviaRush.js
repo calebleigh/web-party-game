@@ -77,8 +77,13 @@ const QUESTIONS = {
 const CATEGORY_LABEL = {
   mixed: "Mixed", science: "Science", geography: "Geography", history: "History",
   animals: "Animals", entertainment: "Screen & Fun", sports: "Sports", food: "Food & Drink",
-  disney: "Disney", starwars: "Star Wars", pokemon: "Pokémon", gaming: "Gaming",
+  funmix: "Fun Mix", disney: "Disney", starwars: "Star Wars", pokemon: "Pokémon", gaming: "Gaming",
 };
+// Two families: general-knowledge categories vs pop-culture "fun" categories.
+// "Mixed" draws only from GENERAL so fandom trivia never leaks into the general
+// pool; "Fun Mix" draws only from FUN.
+const GENERAL_CATS = ["science", "geography", "history", "animals", "entertainment", "sports", "food"];
+const FUN_CATS = ["disney", "starwars", "pokemon", "gaming"];
 
 // Additional verified questions merged into the banks above.
 const MORE = {
@@ -373,18 +378,19 @@ export default {
     {
       key: "category", label: "Category", default: "mixed",
       choices: [
-        { id: "mixed", label: "Mixed" },
-        { id: "science", label: "Science" },
-        { id: "geography", label: "Geography" },
-        { id: "history", label: "History" },
-        { id: "animals", label: "Animals" },
-        { id: "entertainment", label: "Screen & Fun" },
-        { id: "sports", label: "Sports" },
-        { id: "food", label: "Food & Drink" },
-        { id: "disney", label: "Disney" },
-        { id: "starwars", label: "Star Wars" },
-        { id: "pokemon", label: "Pokémon" },
-        { id: "gaming", label: "Gaming" },
+        { id: "mixed", label: "Mixed", group: "General Knowledge" },
+        { id: "science", label: "Science", group: "General Knowledge" },
+        { id: "geography", label: "Geography", group: "General Knowledge" },
+        { id: "history", label: "History", group: "General Knowledge" },
+        { id: "animals", label: "Animals", group: "General Knowledge" },
+        { id: "entertainment", label: "Screen & Fun", group: "General Knowledge" },
+        { id: "sports", label: "Sports", group: "General Knowledge" },
+        { id: "food", label: "Food & Drink", group: "General Knowledge" },
+        { id: "funmix", label: "Fun Mix", group: "Fun & Fandom" },
+        { id: "disney", label: "Disney", group: "Fun & Fandom" },
+        { id: "starwars", label: "Star Wars", group: "Fun & Fandom" },
+        { id: "pokemon", label: "Pokémon", group: "Fun & Fandom" },
+        { id: "gaming", label: "Gaming", group: "Fun & Fandom" },
       ],
     },
     {
@@ -398,8 +404,11 @@ export default {
   ],
 
   start(state, ctx, config = {}) {
-    const cat = QUESTIONS[config.category] ? config.category : "mixed";
-    const pool = cat === "mixed" ? Object.values(QUESTIONS).flat() : QUESTIONS[cat];
+    let cat = config.category || "mixed";
+    let pool;
+    if (cat === "funmix") pool = FUN_CATS.flatMap((c) => QUESTIONS[c] || []);
+    else if (cat !== "mixed" && QUESTIONS[cat]) pool = QUESTIONS[cat];
+    else { cat = "mixed"; pool = GENERAL_CATS.flatMap((c) => QUESTIONS[c] || []); }
     const n = parseInt(config.length, 10) || 8;
     state.category = CATEGORY_LABEL[cat] || "Mixed";
     state.questions = sample(pool, Math.min(n, pool.length));
@@ -455,9 +464,8 @@ export default {
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     const q = state.questions[state.index];
     if (state.screen === "final") {
-      const lb = ctx.gameLeaderboard();
-      const rank = lb.findIndex((p) => p.id === playerId) + 1;
-      return { screen: "final", rank, total: lb.length, me: ctx.gameScore(playerId) };
+      const r = ctx.gameRank(playerId);
+      return { screen: "final", rank: r.rank, total: r.total, tied: r.tied, me: ctx.gameScore(playerId) };
     }
     const mine = state.answers[playerId];
     return {

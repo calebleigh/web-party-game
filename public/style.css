@@ -774,13 +774,24 @@ body::before {
 .sb-name { flex: 1; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--ink); }
 .sb-score { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; color: var(--cyan); text-shadow: var(--glow-cyan); }
 
-/* "Who's that Pokémon?" silhouette — black during the question, full color on reveal. */
-.silhouette-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 8px 0; }
+/* "Who's that Pokémon?" silhouette — black during the question, full color on reveal.
+ * Height is viewport-relative so the reveal (image + name + options + leaderboard)
+ * always fits the main screen without scrolling. */
+.silhouette-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 2px 0 6px; min-height: 0; flex: 0 0 auto; }
 .silhouette-img {
-  width: 280px; height: 280px; object-fit: contain;
+  width: auto; height: clamp(96px, 18vh, 210px); max-width: 88vw; object-fit: contain;
   filter: brightness(0); transition: filter 0.45s ease;
-  image-rendering: auto;
 }
 .silhouette-img.revealed { filter: none; animation: silpop 0.5s ease; }
 @keyframes silpop { 0% { transform: scale(0.88); } 60% { transform: scale(1.07); } 100% { transform: scale(1); } }
-.silhouette-name { font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; color: var(--yellow); text-shadow: var(--glow-yellow); }
+.silhouette-name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.3rem, 3vh, 2rem); color: var(--yellow); text-shadow: var(--glow-yellow); }
+
+/* Section headers inside the VIP's category picker (General vs Fun & Fandom). */
+.hub-group { flex-basis: 100%; width: 100%; text-align: center; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: var(--yellow); margin-top: 10px; }
+.hub-group:first-child { margin-top: 0; }
+
+/* The main (host) screen is a fixed stage — it must never scroll. Phones
+ * (body.player) still scroll normally. */
+body.host { overflow: hidden; }
+body.host #app, body.host .host-shell { height: 100dvh; min-height: 0; }
+.host-main { min-height: 0; overflow: hidden; }

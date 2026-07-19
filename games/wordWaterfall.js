@@ -447,8 +447,11 @@ export default {
       const standings = ctx.players()
         .map((p) => ({ id: p.id, total: state.gameTotals[p.id] || 0 }))
         .sort((a, b) => b.total - a.total);
-      const rank = standings.findIndex((s) => s.id === playerId) + 1;
-      return { screen: "final", rank, total: standings.length, myTotal: state.gameTotals[playerId] || 0 };
+      const myTotal = state.gameTotals[playerId] || 0;
+      // Competition rank: tied players share a rank (two firsts -> both rank 1).
+      const rank = standings.filter((s) => s.total > myTotal).length + 1;
+      const tied = standings.filter((s) => s.total === myTotal).length > 1;
+      return { screen: "final", rank, total: standings.length, tied, myTotal };
     }
     if (state.screen === "roundresults") {
       const scores = ctx.players().map((p) => ({ id: p.id, round: state.roundScores[p.id] || 0 })).sort((a, b) => b.round - a.round);

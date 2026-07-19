@@ -352,8 +352,8 @@ export default {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     if (state.screen === "final") {
-      const lb = ctx.gameLeaderboard();
-      return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
+      const r = ctx.gameRank(playerId);
+      return { screen: "final", rank: r.rank, total: r.total, tied: r.tied };
     }
     const view = { screen: state.screen, doubleRound: state.index === state.questions.length - 1 && state.questions.length > 1 };
     if (state.screen === "write") {

@@ -200,15 +200,20 @@ function vipHubBody(hub) {
     <div class="hub-opt">
       <div class="hub-opt-label">${esc(opt.label)}${opt.type === "multi" ? " (optional)" : ""}</div>
       <div class="hub-choices">
-        ${opt.choices.map((c) => {
-          const on = opt.type === "multi"
-            ? Array.isArray(hub.config[opt.key]) && hub.config[opt.key].includes(c.id)
-            : hub.config[opt.key] === c.id;
-          const handler = opt.type === "multi" ? `toggleOptVip('${opt.key}','${c.id}')` : `setOptVip('${opt.key}','${c.id}')`;
-          return `<button class="hub-choice ${on ? "on" : ""}" onclick="${handler}">
-            <span class="hc-label">${esc(c.label)}</span>${c.hint ? `<span class="hc-hint">${esc(c.hint)}</span>` : ""}
-          </button>`;
-        }).join("")}
+        ${(() => {
+          let lastGroup = null;
+          return opt.choices.map((c) => {
+            const on = opt.type === "multi"
+              ? Array.isArray(hub.config[opt.key]) && hub.config[opt.key].includes(c.id)
+              : hub.config[opt.key] === c.id;
+            const handler = opt.type === "multi" ? `toggleOptVip('${opt.key}','${c.id}')` : `setOptVip('${opt.key}','${c.id}')`;
+            let header = "";
+            if (c.group && c.group !== lastGroup) { header = `<div class="hub-group">${esc(c.group)}</div>`; lastGroup = c.group; }
+            return `${header}<button class="hub-choice ${on ? "on" : ""}" onclick="${handler}">
+              <span class="hc-label">${esc(c.label)}</span>${c.hint ? `<span class="hc-hint">${esc(c.hint)}</span>` : ""}
+            </button>`;
+          }).join("");
+        })()}
       </div>
     </div>`).join("");
   return `
@@ -269,7 +274,7 @@ function finalP(g) {
     ? `<span style="color:var(--yellow)">${icon("trophy", "status-ic")}</span>`
     : `<span class="rank-badge big-rank r${g.rank <= 3 ? g.rank : "n"}">${g.rank}</span>`;
   return `${badge}
-    <h1>${g.rank === 1 ? "You won!" : `#${g.rank} of ${g.total}`}</h1>
+    <h1>${g.rank === 1 ? (g.tied ? "You tied for 1st!" : "You won!") : `#${g.rank} of ${g.total}`}</h1>
     <p class="muted">Great game! Wait for the host to pick the next one.</p>`;
 }
 
@@ -298,7 +303,7 @@ function pWord(g) {
       ? `<span style="color:var(--yellow)">${icon("trophy", "status-ic")}</span>`
       : `<span class="rank-badge big-rank r${g.rank <= 3 ? g.rank : "n"}">${g.rank}</span>`;
     return `${badge}
-      <h1>${g.rank === 1 ? "You won!" : `#${g.rank} of ${g.total}`}</h1>
+      <h1>${g.rank === 1 ? (g.tied ? "You tied for 1st!" : "You won!") : `#${g.rank} of ${g.total}`}</h1>
       <p class="muted">Final total: <b>${g.myTotal}</b></p>`;
   }
   if (g.screen === "roundresults") {

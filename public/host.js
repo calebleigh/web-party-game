@@ -189,16 +189,21 @@ function renderHub() {
     <div class="hub-opt">
       <div class="hub-opt-label">${esc(opt.label)}${opt.type === "multi" ? " (optional)" : ""}</div>
       <div class="hub-choices">
-        ${opt.choices.map((c) => {
-          const on = opt.type === "multi"
-            ? Array.isArray(h.config[opt.key]) && h.config[opt.key].includes(c.id)
-            : h.config[opt.key] === c.id;
-          const handler = opt.type === "multi" ? `toggleOpt('${opt.key}','${c.id}')` : `setOpt('${opt.key}','${c.id}')`;
-          return `<button class="hub-choice ${on ? "on" : ""}" onclick="${handler}">
-            <span class="hc-label">${esc(c.label)}</span>
-            ${c.hint ? `<span class="hc-hint">${esc(c.hint)}</span>` : ""}
-          </button>`;
-        }).join("")}
+        ${(() => {
+          let lastGroup = null;
+          return opt.choices.map((c) => {
+            const on = opt.type === "multi"
+              ? Array.isArray(h.config[opt.key]) && h.config[opt.key].includes(c.id)
+              : h.config[opt.key] === c.id;
+            const handler = opt.type === "multi" ? `toggleOpt('${opt.key}','${c.id}')` : `setOpt('${opt.key}','${c.id}')`;
+            let header = "";
+            if (c.group && c.group !== lastGroup) { header = `<div class="hub-group">${esc(c.group)}</div>`; lastGroup = c.group; }
+            return `${header}<button class="hub-choice ${on ? "on" : ""}" onclick="${handler}">
+              <span class="hc-label">${esc(c.label)}</span>
+              ${c.hint ? `<span class="hc-hint">${esc(c.hint)}</span>` : ""}
+            </button>`;
+          }).join("");
+        })()}
       </div>
     </div>`).join("");
 
@@ -348,11 +353,23 @@ function leaderboardHTML(lb, title = "Leaderboard") {
     </div>`).join("")}</div>`;
 }
 
+/* Winner headline that respects ties: sole leader -> "X wins!", shared top ->
+ * a tie/draw message, nobody scored -> "Nobody scored!". `entries` must be
+ * sorted highest-first; `key` is the score field ("score" or "total"). */
+function winnerHeadline(entries, key = "score") {
+  if (!entries || !entries.length) return "Game over!";
+  const top = entries[0][key] || 0;
+  const leaders = entries.filter((e) => (e[key] || 0) === top);
+  if (top === 0) return "Nobody scored!";
+  if (leaders.length === 1) return esc(leaders[0].name) + " wins!";
+  if (leaders.length === 2) return `It's a tie — ${esc(leaders[0].name)} &amp; ${esc(leaders[1].name)}!`;
+  return `It's a ${leaders.length}-way tie!`;
+}
+
 function finalScreen(lb) {
-  const winner = lb && lb[0];
   return `<div class="center" style="min-height:auto;gap:24px">
     <span style="color:var(--yellow)">${icon("trophy", "status-ic")}</span>
-    <h1 style="font-size:3rem">${winner ? esc(winner.name) + " wins!" : "Game over!"}</h1>
+    <h1 style="font-size:3rem">${winnerHeadline(lb, "score")}</h1>
     ${leaderboardHTML(lb, "Final scores")}
     <button class="btn big teal" onclick="endGame()">Back to games</button>
   </div>`;
@@ -504,10 +521,9 @@ function viewWordRoundResults(g) {
 }
 
 function viewWordFinal(g) {
-  const winner = g.standings && g.standings[0];
   return `<div class="center" style="min-height:auto;gap:22px">
     <span style="color:var(--yellow)">${icon("trophy", "status-ic")}</span>
-    <h1 style="font-size:2.6rem">${winner ? esc(winner.name) + " wins!" : "Game over!"}</h1>
+    <h1 style="font-size:2.6rem">${winnerHeadline(g.standings, "total")}</h1>
     <p class="muted">${g.roundsPlayed} round${g.roundsPlayed === 1 ? "" : "s"} played</p>
     <div class="score-table">
       <div class="score-row score-head"><span class="st-rank"></span><span class="st-name">Player</span><span class="st-total">Total</span></div>
