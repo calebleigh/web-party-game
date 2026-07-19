@@ -1,4 +1,5 @@
 import { shuffle, pick, normalize } from "./util.js";
+import { generatePuzzle, generateQuickWord, generatorReady } from "./wordGen.js";
 
 /* Word Hunt — spell words from a shared letter bank (like Words on Stream).
  * Difficulty picks the bank pool; format decides how many rounds. */
@@ -115,18 +116,29 @@ function beginRound(state, ctx) {
 
   let letters, words;
   if (state.format === "quick") {
-    // Quickdraw: a single-word anagram race.
-    const all = pool.flatMap((p) => p.words).filter((w) => w.length >= 4);
-    if (!state.usedWords || state.usedWords.length >= all.length) state.usedWords = [];
-    let word;
-    do { word = pick(all); } while (state.usedWords.includes(word) && state.usedWords.length < all.length);
+    // Quickdraw: a single-word anagram race. Generate a fresh word; fall back to
+    // the curated pool's words if the generator is unavailable.
+    state.usedWords = state.usedWords || [];
+    let word = generatorReady() ? generateQuickWord(state.difficulty) : null;
+    for (let t = 0; word && state.usedWords.includes(word) && t < 20; t++) word = generateQuickWord(state.difficulty);
+    if (!word) {
+      const all = pool.flatMap((p) => p.words).filter((w) => w.length >= 4);
+      if (state.usedWords.length >= all.length) state.usedWords = [];
+      do { word = pick(all); } while (state.usedWords.includes(word) && state.usedWords.length < all.length);
+    }
     state.usedWords.push(word);
     letters = word.split("");
     words = [word];
   } else {
-    if (!state.used || state.used.length >= pool.length) state.used = [];
-    let puzzle;
-    do { puzzle = pick(pool); } while (state.used.includes(puzzle.letters) && state.used.length < pool.length);
+    // Generate a fresh puzzle (effectively unlimited); fall back to the curated
+    // pool if the word list isn't available. `used` dedups within a game.
+    state.used = state.used || [];
+    let puzzle = generatorReady() ? generatePuzzle(state.difficulty) : null;
+    for (let t = 0; puzzle && state.used.includes(puzzle.letters) && t < 20; t++) puzzle = generatePuzzle(state.difficulty);
+    if (!puzzle) {
+      if (state.used.length >= pool.length) state.used = [];
+      do { puzzle = pick(pool); } while (state.used.includes(puzzle.letters) && state.used.length < pool.length);
+    }
     state.used.push(puzzle.letters);
     letters = puzzle.letters.split("");
     words = [...puzzle.words].sort((a, b) => a.length - b.length || a.localeCompare(b));
