@@ -1,0 +1,15 @@
+{
+  "name": "shindig",
+  "version": "1.0.0",
+  "description": "A dark, neon party-game night — one big screen, everyone plays on their phones.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
