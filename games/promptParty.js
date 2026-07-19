@@ -1,4 +1,4 @@
-import { shuffle, sample, leaderboard, countIn, timesUp } from "./util.js";
+import { shuffle, sample, countIn, timesUp } from "./util.js";
 
 const PROMPTS = [
   "A terrible name for a cruise ship",
@@ -239,7 +239,7 @@ export default {
     const prompt = state.prompts[state.index];
     const timeLeft = Math.max(0, Math.ceil((state.endsAt - ctx.now()) / 1000));
     if (state.screen === "final") {
-      return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+      return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     }
     const view = {
       screen: state.screen,
@@ -258,7 +258,7 @@ export default {
       view.players = ctx.players().length;
     } else if (state.screen === "reveal") {
       view.results = state.results;
-      view.leaderboard = leaderboard(ctx.players());
+      view.leaderboard = ctx.gameLeaderboard();
     }
     return view;
   },
@@ -267,7 +267,7 @@ export default {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
     }
     const view = { screen: state.screen, mode: state.mode };

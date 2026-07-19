@@ -1,4 +1,4 @@
-import { sample, normalize, leaderboard, countIn, timesUp } from "./util.js";
+import { sample, normalize, countIn, timesUp } from "./util.js";
 
 /* Herd Mentality — answer the question; you score only if your answer matches
  * the majority (the "herd"). Think like everyone else! */
@@ -146,7 +146,7 @@ export default {
     const q = state.questions[state.index];
     const timeLeft = Math.max(0, Math.ceil((state.endsAt - ctx.now()) / 1000));
     if (state.screen === "final") {
-      return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+      return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     }
     if (state.screen === "reveal") {
       return {
@@ -155,7 +155,7 @@ export default {
         total: state.questions.length,
         question: q,
         result: state.result,
-        leaderboard: leaderboard(ctx.players()),
+        leaderboard: ctx.gameLeaderboard(),
       };
     }
     return {
@@ -173,7 +173,7 @@ export default {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
     }
     if (state.screen === "reveal") {

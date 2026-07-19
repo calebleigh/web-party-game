@@ -1,4 +1,4 @@
-import { shuffle, sample, leaderboard, countIn, timesUp } from "./util.js";
+import { shuffle, sample, countIn, timesUp } from "./util.js";
 
 /* Questions grouped by category. Each: { q, options[4], answer index }. */
 const QUESTIONS = {
@@ -148,6 +148,96 @@ const MORE = {
 };
 for (const c of Object.keys(MORE)) if (QUESTIONS[c]) QUESTIONS[c].push(...MORE[c]);
 
+// Second content batch — deepens every category so single-category games don't
+// repeat quickly (mixed pool grows to ~175 questions).
+const MORE2 = {
+  science: [
+    { q: "What is the chemical symbol for oxygen?", options: ["Ox", "O", "Om", "Og"], answer: 1 },
+    { q: "What is the closest star to Earth?", options: ["The Sun", "Proxima Centauri", "Sirius", "Polaris"], answer: 0 },
+    { q: "What gas do humans need to breathe to survive?", options: ["Nitrogen", "Carbon dioxide", "Oxygen", "Helium"], answer: 2 },
+    { q: "What is the process by which plants make food using sunlight?", options: ["Respiration", "Digestion", "Photosynthesis", "Evaporation"], answer: 2 },
+    { q: "How many colors are in a rainbow?", options: ["5", "6", "7", "8"], answer: 2 },
+    { q: "What organ pumps blood around the human body?", options: ["Lungs", "Heart", "Liver", "Brain"], answer: 1 },
+    { q: "Which blood cells help fight infection?", options: ["Red blood cells", "White blood cells", "Platelets", "Plasma"], answer: 1 },
+    { q: "What is the chemical symbol for sodium?", options: ["So", "Na", "Sd", "Sn"], answer: 1 },
+    { q: "What is the study of living things called?", options: ["Geology", "Chemistry", "Biology", "Physics"], answer: 2 },
+    { q: "Sound cannot travel through which of these?", options: ["Water", "Air", "A vacuum", "Metal"], answer: 2 },
+  ],
+  geography: [
+    { q: "What is the longest river in the world?", options: ["Amazon", "Nile", "Yangtze", "Mississippi"], answer: 1 },
+    { q: "What is the capital of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Perth"], answer: 2 },
+    { q: "The Eiffel Tower is located in which city?", options: ["London", "Paris", "Rome", "Madrid"], answer: 1 },
+    { q: "Which country is shaped like a boot?", options: ["Spain", "Greece", "Italy", "Portugal"], answer: 2 },
+    { q: "What is the capital of Egypt?", options: ["Cairo", "Alexandria", "Giza", "Luxor"], answer: 0 },
+    { q: "Which continent is the coldest?", options: ["Europe", "Asia", "Antarctica", "South America"], answer: 2 },
+    { q: "What is the capital of Germany?", options: ["Munich", "Hamburg", "Frankfurt", "Berlin"], answer: 3 },
+    { q: "Which country has the most people in the world?", options: ["China", "India", "United States", "Indonesia"], answer: 1 },
+    { q: "What is the capital of Spain?", options: ["Barcelona", "Madrid", "Seville", "Valencia"], answer: 1 },
+    { q: "Which US city is known as the 'Big Apple'?", options: ["Los Angeles", "Chicago", "New York City", "Boston"], answer: 2 },
+  ],
+  history: [
+    { q: "Who was the famous queen of ancient Egypt?", options: ["Nefertiti", "Cleopatra", "Hatshepsut", "Isis"], answer: 1 },
+    { q: "The Statue of Liberty was a gift to the US from which country?", options: ["Britain", "Spain", "France", "Italy"], answer: 2 },
+    { q: "Which US president is on the one-dollar bill?", options: ["Abraham Lincoln", "George Washington", "Thomas Jefferson", "Benjamin Franklin"], answer: 1 },
+    { q: "In which country was the Great Wall built?", options: ["Japan", "China", "India", "Mongolia"], answer: 1 },
+    { q: "Who was the leader of Nazi Germany during World War II?", options: ["Mussolini", "Stalin", "Hitler", "Franco"], answer: 2 },
+    { q: "The Renaissance began in which country?", options: ["France", "England", "Germany", "Italy"], answer: 3 },
+    { q: "Which country is home to the ancient Great Pyramid of Giza?", options: ["Greece", "Egypt", "Mexico", "Peru"], answer: 1 },
+    { q: "Who was assassinated in Dallas in 1963?", options: ["Abraham Lincoln", "John F. Kennedy", "Martin Luther King Jr.", "Robert Kennedy"], answer: 1 },
+    { q: "What was the name of the ship that brought the Pilgrims to America?", options: ["Santa Maria", "Mayflower", "Endeavour", "Beagle"], answer: 1 },
+    { q: "Which wall fell in 1989, reuniting a divided city?", options: ["Berlin Wall", "Great Wall", "Hadrian's Wall", "Wailing Wall"], answer: 0 },
+  ],
+  animals: [
+    { q: "What is a baby dog called?", options: ["Kitten", "Puppy", "Cub", "Foal"], answer: 1 },
+    { q: "Which animal is known for changing the color of its skin?", options: ["Chameleon", "Zebra", "Panda", "Kangaroo"], answer: 0 },
+    { q: "What is the largest species of shark?", options: ["Great white shark", "Whale shark", "Hammerhead shark", "Tiger shark"], answer: 1 },
+    { q: "Which animal is famous for its black and white stripes?", options: ["Leopard", "Zebra", "Cheetah", "Hyena"], answer: 1 },
+    { q: "What do caterpillars turn into?", options: ["Beetles", "Spiders", "Butterflies", "Bees"], answer: 2 },
+    { q: "Which sea creature has eight arms?", options: ["Squid", "Jellyfish", "Starfish", "Octopus"], answer: 3 },
+    { q: "What is the largest big cat in the world?", options: ["Lion", "Tiger", "Jaguar", "Leopard"], answer: 1 },
+    { q: "Which animal sleeps hanging upside down?", options: ["Owl", "Bat", "Sloth", "Squirrel"], answer: 1 },
+    { q: "What do you call an animal that eats only plants?", options: ["Carnivore", "Herbivore", "Omnivore", "Insectivore"], answer: 1 },
+    { q: "Which bird is known for saying 'hoot' at night?", options: ["Robin", "Owl", "Crow", "Dove"], answer: 1 },
+  ],
+  entertainment: [
+    { q: "What is the name of the coffee shop in the TV show 'Friends'?", options: ["Central Perk", "The Grind", "Java Joe's", "Cafe Nervosa"], answer: 0 },
+    { q: "Which movie features a shark terrorizing a beach town?", options: ["Jaws", "Titanic", "Aquaman", "Free Willy"], answer: 0 },
+    { q: "In Star Wars, who is Luke Skywalker's father?", options: ["Obi-Wan Kenobi", "Yoda", "Darth Vader", "Han Solo"], answer: 2 },
+    { q: "What is the name of Woody's owner in 'Toy Story'?", options: ["Andy", "Sid", "Bonnie", "Al"], answer: 0 },
+    { q: "Which band sang 'Hey Jude'?", options: ["The Rolling Stones", "The Beatles", "Queen", "The Who"], answer: 1 },
+    { q: "In 'Aladdin', what is the name of the pet monkey?", options: ["Abu", "Iago", "Rajah", "Jafar"], answer: 0 },
+    { q: "What is the name of the fairy in 'Peter Pan'?", options: ["Wendy", "Tinker Bell", "Cinderella", "Thumbelina"], answer: 1 },
+    { q: "Which superhero swings between buildings using webs?", options: ["Batman", "Superman", "Spider-Man", "Thor"], answer: 2 },
+    { q: "What color are the Minions in 'Despicable Me'?", options: ["Green", "Blue", "Yellow", "Orange"], answer: 2 },
+    { q: "Which movie features a young lion named Simba?", options: ["Madagascar", "The Lion King", "Zootopia", "Kung Fu Panda"], answer: 1 },
+  ],
+  sports: [
+    { q: "How many players are on a volleyball team on the court?", options: ["5", "6", "7", "8"], answer: 1 },
+    { q: "In tennis, what is a score of zero called?", options: ["Nil", "Love", "Duck", "Blank"], answer: 1 },
+    { q: "Which country hosts the Wimbledon tennis tournament?", options: ["United States", "France", "England", "Australia"], answer: 2 },
+    { q: "What shape is a soccer goal net opening?", options: ["Circle", "Triangle", "Rectangle", "Oval"], answer: 2 },
+    { q: "In boxing, what does 'KO' stand for?", options: ["Knock Out", "Keep On", "Kick Off", "Knee Out"], answer: 0 },
+    { q: "How many bases are there in baseball?", options: ["3", "4", "5", "6"], answer: 1 },
+    { q: "Which sport features terms like 'birdie' and 'bogey'?", options: ["Tennis", "Golf", "Cricket", "Bowling"], answer: 1 },
+    { q: "In which sport do teams compete for the Stanley Cup?", options: ["Basketball", "Ice hockey", "Baseball", "Football"], answer: 1 },
+    { q: "What is the maximum score with a single dart throw on a standard board?", options: ["50", "60", "40", "20"], answer: 1 },
+    { q: "How long is a marathon, roughly?", options: ["10 miles", "26 miles", "50 miles", "100 miles"], answer: 1 },
+  ],
+  food: [
+    { q: "What is the main ingredient in an omelette?", options: ["Cheese", "Eggs", "Flour", "Milk"], answer: 1 },
+    { q: "Which drink is made from roasted beans and is popular in the morning?", options: ["Tea", "Coffee", "Juice", "Cocoa"], answer: 1 },
+    { q: "What is traditionally served on top of a pizza?", options: ["Chocolate", "Cheese", "Jam", "Icing"], answer: 1 },
+    { q: "Which fruit is yellow and curved?", options: ["Apple", "Banana", "Grape", "Cherry"], answer: 1 },
+    { q: "What food is a 'baguette' a type of?", options: ["Cheese", "Bread", "Pasta", "Soup"], answer: 1 },
+    { q: "Which nut is used to make peanut butter?", options: ["Almond", "Walnut", "Peanut", "Cashew"], answer: 2 },
+    { q: "What is the frozen dessert often served in a cone?", options: ["Cake", "Ice cream", "Pudding", "Pie"], answer: 1 },
+    { q: "Which vegetable is orange and loved by rabbits?", options: ["Broccoli", "Carrot", "Celery", "Cucumber"], answer: 1 },
+    { q: "What dairy product is churned to make butter?", options: ["Yogurt", "Cream", "Cheese", "Ice"], answer: 1 },
+    { q: "Which spice gives curry its yellow color?", options: ["Paprika", "Turmeric", "Cinnamon", "Ginger"], answer: 1 },
+  ],
+};
+for (const c of Object.keys(MORE2)) if (QUESTIONS[c]) QUESTIONS[c].push(...MORE2[c]);
+
 const QUESTION_MS = 15_000;
 const REVEAL_MS = 4_000;
 
@@ -259,7 +349,7 @@ export default {
     const q = state.questions[state.index];
     const timeLeft = Math.max(0, Math.ceil((state.endsAt - ctx.now()) / 1000));
     if (state.screen === "final") {
-      return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+      return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     }
     const counts = [0, 0, 0, 0];
     for (const a of Object.values(state.answers)) counts[a.choice]++;
@@ -275,7 +365,7 @@ export default {
       players: ctx.players().length,
       correctIndex: state.screen === "reveal" ? q.answer : null,
       counts: state.screen === "reveal" ? counts : null,
-      leaderboard: state.screen === "reveal" ? leaderboard(ctx.players()) : null,
+      leaderboard: state.screen === "reveal" ? ctx.gameLeaderboard() : null,
     };
   },
 
@@ -284,9 +374,9 @@ export default {
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     const q = state.questions[state.index];
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       const rank = lb.findIndex((p) => p.id === playerId) + 1;
-      return { screen: "final", rank, total: lb.length, me: ctx.player(playerId)?.score };
+      return { screen: "final", rank, total: lb.length, me: ctx.gameScore(playerId) };
     }
     const mine = state.answers[playerId];
     return {

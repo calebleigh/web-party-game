@@ -739,3 +739,37 @@ body::before {
   .opt { padding: 14px; font-size: 1.1rem; }
   .join-badge .jb-qr { width: 40px; height: 40px; }
 }
+
+/* Session leaderboard — running cross-game total shown on the lobby screen. */
+.session-board {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1.5px solid var(--panel-line);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  margin-top: 6px;
+}
+.sb-head {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  color: var(--ink); margin-bottom: 12px;
+}
+.sb-trophy { width: 22px; height: 22px; color: var(--yellow); }
+.sb-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.sb-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-2); border: 1.5px solid var(--panel-line);
+  border-radius: var(--radius-sm); padding: 10px 16px;
+}
+.sb-rank {
+  flex: none; width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+  background: var(--panel); color: var(--ink-soft); border: 1.5px solid var(--panel-line);
+}
+.sb-row.r1 .sb-rank { background: linear-gradient(180deg, #ffe680, #ffb733); color: #3a2600; border: none; box-shadow: var(--glow-yellow); }
+.sb-row.r2 .sb-rank { background: linear-gradient(180deg, #eef1f7, #b9c2d6); color: #2a2f3a; border: none; }
+.sb-row.r3 .sb-rank { background: linear-gradient(180deg, #f0b98a, #cf8a52); color: #3a2200; border: none; }
+.sb-row.r1 { border-color: rgba(255,217,61,0.55); }
+.sb-name { flex: 1; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--ink); }
+.sb-score { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; color: var(--cyan); text-shadow: var(--glow-cyan); }

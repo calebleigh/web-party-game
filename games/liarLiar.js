@@ -1,4 +1,4 @@
-import { shuffle, sample, normalize, leaderboard, countIn, timesUp } from "./util.js";
+import { shuffle, sample, normalize, countIn, timesUp } from "./util.js";
 
 const QUESTIONS = {
   animals: [
@@ -90,6 +90,77 @@ const MORE_LL = {
   ],
 };
 for (const c of Object.keys(MORE_LL)) QUESTIONS[c].push(...MORE_LL[c]);
+
+// Second batch — deepens every category, with the biggest boost to the two
+// thinnest pools (space, history) so a single game no longer exhausts them.
+const MORE_LL2 = {
+  animals: [
+    { prompt: "A group of larks is called an _____.", answer: "Exaltation" },
+    { prompt: "A group of porcupines is called a _____.", answer: "Prickle" },
+    { prompt: "A group of giraffes is called a _____.", answer: "Tower" },
+    { prompt: "A group of pugs is called a _____.", answer: "Grumble" },
+    { prompt: "Sea otters hold _____ while they sleep so they don't drift apart.", answer: "Hands" },
+    { prompt: "A baby hedgehog is called a _____.", answer: "Hoglet" },
+  ],
+  words: [
+    { prompt: "The white crescent at the base of your fingernail is called the _____.", answer: "Lunula" },
+    { prompt: "The dimple in the bottom of a wine bottle is called the _____.", answer: "Punt" },
+    { prompt: "The cardboard sleeve around a hot coffee cup is called a _____.", answer: "Zarf" },
+    { prompt: "The archaic English word for 'the day before yesterday' is _____.", answer: "Ereyesterday" },
+    { prompt: "The tiny muscles that give you goosebumps are the arrector _____ muscles.", answer: "Pili" },
+    { prompt: "The two dots over a vowel, as in 'naïve,' form a _____.", answer: "Diaeresis" },
+  ],
+  science: [
+    { prompt: "Under the right conditions, hot water can freeze faster than cold — the _____ effect.", answer: "Mpemba" },
+    { prompt: "A bolt of lightning is roughly five times hotter than the surface of the _____.", answer: "Sun" },
+    { prompt: "Water can boil and freeze at the very same time at its _____ point.", answer: "Triple" },
+    { prompt: "Inhaling the gas sulfur hexafluoride makes your voice sound much _____.", answer: "Deeper" },
+    { prompt: "Bees can be trained to recognize individual human _____.", answer: "Faces" },
+    { prompt: "Onions make you cry by releasing a mild form of sulfuric _____.", answer: "Acid" },
+    { prompt: "Antarctica is technically the largest _____ on Earth.", answer: "Desert" },
+    { prompt: "Because heat makes its iron expand, the Eiffel Tower is taller in _____ than in winter.", answer: "Summer" },
+  ],
+  food: [
+    { prompt: "In large amounts, the common spice _____ is toxic and even hallucinogenic.", answer: "Nutmeg" },
+    { prompt: "Apples float in water because they are about a quarter _____.", answer: "Air" },
+    { prompt: "Pineapple 'bites back' because it contains an enzyme that digests _____.", answer: "Protein" },
+    { prompt: "The Aztecs used cacao beans as a form of _____.", answer: "Currency" },
+    { prompt: "Worcestershire sauce is traditionally fermented with _____.", answer: "Anchovies" },
+    { prompt: "Every color of Froot Loops is actually the exact same _____.", answer: "Flavor" },
+    { prompt: "An ear of corn almost always has an _____ number of rows.", answer: "Even" },
+    { prompt: "Stored in large piles, pistachios can spontaneously _____.", answer: "Combust" },
+  ],
+  history: [
+    { prompt: "Oxford University is older than the Aztec _____.", answer: "Empire" },
+    { prompt: "Napoleon was actually about average _____ for his era, not short.", answer: "Height" },
+    { prompt: "France carried out its last guillotine execution in _____, the same year Star Wars premiered.", answer: "1977" },
+    { prompt: "Harvard University was founded before _____ was even invented.", answer: "Calculus" },
+    { prompt: "The Eiffel Tower was built as a temporary structure meant to stand only _____ years.", answer: "Twenty" },
+    { prompt: "In 1518, hundreds of people in Strasbourg were struck by a mysterious dancing _____.", answer: "Plague" },
+    { prompt: "George Washington's famous 'wooden' teeth were never actually made of _____.", answer: "Wood" },
+    { prompt: "Early versions of Coca-Cola really did contain traces of _____.", answer: "Cocaine" },
+    { prompt: "Betty White was born before sliced _____ was invented.", answer: "Bread" },
+    { prompt: "The very first ancient Olympics had a single event: a foot _____.", answer: "Race" },
+    { prompt: "The very first product ever scanned by a barcode was a pack of _____.", answer: "Gum" },
+    { prompt: "When Britain adopted the modern calendar in 1752, it simply skipped _____ days.", answer: "Eleven" },
+  ],
+  space: [
+    { prompt: "There are more _____ in the universe than grains of sand on all of Earth's beaches.", answer: "Stars" },
+    { prompt: "The astronauts' footprints on the Moon could last millions of years because it has no _____.", answer: "Wind" },
+    { prompt: "The Sun makes up about 99.8% of the total _____ of the entire solar system.", answer: "Mass" },
+    { prompt: "A single teaspoon of neutron star material would weigh about a billion _____.", answer: "Tons" },
+    { prompt: "Because sound can't travel through a vacuum, outer space is completely _____.", answer: "Silent" },
+    { prompt: "The Moon is slowly drifting away from Earth by a few centimeters every _____.", answer: "Year" },
+    { prompt: "Jupiter's Great Red Spot is a single storm larger than the entire planet _____.", answer: "Earth" },
+    { prompt: "Saturn's spectacular rings are made almost entirely of chunks of _____.", answer: "Ice" },
+    { prompt: "Roughly one million _____ could fit inside the Sun.", answer: "Earths" },
+    { prompt: "The hottest planet in our solar system is actually _____, not Mercury.", answer: "Venus" },
+    { prompt: "Uranus is tilted so far over that it essentially orbits the Sun on its _____.", answer: "Side" },
+    { prompt: "Near the center of our galaxy floats a giant cloud of _____.", answer: "Alcohol" },
+    { prompt: "The International Space Station circles the entire Earth about once every 90 _____.", answer: "Minutes" },
+  ],
+};
+for (const c of Object.keys(MORE_LL2)) QUESTIONS[c].push(...MORE_LL2[c]);
 
 const CATEGORY_LABEL = { mixed: "Mixed", animals: "Animals", words: "Words", science: "Science", food: "Food", history: "History", space: "Space" };
 
@@ -252,7 +323,7 @@ export default {
     const q = state.questions[state.index];
     const timeLeft = Math.max(0, Math.ceil((state.endsAt - ctx.now()) / 1000));
     if (state.screen === "final") {
-      return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+      return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     }
     const view = {
       screen: state.screen,
@@ -272,7 +343,7 @@ export default {
     } else if (state.screen === "reveal") {
       view.answer = q.answer;
       view.results = state.revealData;
-      view.leaderboard = leaderboard(ctx.players());
+      view.leaderboard = ctx.gameLeaderboard();
     }
     return view;
   },
@@ -281,7 +352,7 @@ export default {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
     }
     const view = { screen: state.screen, doubleRound: state.index === state.questions.length - 1 && state.questions.length > 1 };

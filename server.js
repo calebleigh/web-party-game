@@ -304,6 +304,10 @@ class GameController {
     this.def = def;
     this.config = config;
     this.state = {};
+    // Snapshot every player's session score at kickoff so we can report the
+    // points earned IN THIS PLAY (delta) separately from the running session total.
+    this.startScores = new Map();
+    for (const [id, p] of room.players) this.startScores.set(id, p.score);
     this.ctx = {
       players: () => room.activePlayers(),
       player: (id) => room.players.get(id),
@@ -315,6 +319,20 @@ class GameController {
         const p = room.players.get(id);
         if (p) p.score = points;
       },
+      // Points a player has earned during THIS game only (score − snapshot).
+      // Falls back to the current score as the baseline for anyone who joined
+      // after kickoff, so they read 0 rather than their whole session total.
+      gameScore: (id) => {
+        const p = room.players.get(id);
+        if (!p) return 0;
+        const base = this.startScores.has(id) ? this.startScores.get(id) : p.score;
+        return p.score - base;
+      },
+      // Active players ranked by this-game points — same shape as util.leaderboard,
+      // but `score` is the per-play delta rather than the session total.
+      gameLeaderboard: () => room.activePlayers()
+        .map((p) => ({ id: p.id, name: p.name, color: p.color, score: this.ctx.gameScore(p.id) }))
+        .sort((a, b) => b.score - a.score),
       after: (ms, fn) => room.setTimer(fn, ms),
       sync: () => room.sync(),
       syncHost: () => room.syncHost(),

@@ -1,4 +1,4 @@
-import { shuffle, pick, normalize, leaderboard, countIn, timesUp } from "./util.js";
+import { shuffle, pick, normalize, countIn, timesUp } from "./util.js";
 
 /* Doodle Dash — one player draws a secret word; everyone else races to guess it. */
 
@@ -176,10 +176,10 @@ export default {
   hostView(state, ctx) {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
-    if (state.screen === "final") return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+    if (state.screen === "final") return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     const drawer = ctx.player(state.drawerId);
     if (state.screen === "result") {
-      return { screen: "result", round: state.round + 1, total: state.totalRounds, result: state.result, leaderboard: leaderboard(ctx.players()) };
+      return { screen: "result", round: state.round + 1, total: state.totalRounds, result: state.result, leaderboard: ctx.gameLeaderboard() };
     }
     return {
       screen: "draw",
@@ -200,7 +200,7 @@ export default {
     if (state.screen === "countin") return { screen: "countin", count: state.countin };
     if (state.screen === "timesup") return { screen: "timesup", label: state.timesUpLabel };
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
     }
     const isDrawer = playerId === state.drawerId;

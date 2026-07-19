@@ -120,11 +120,36 @@ function renderLobby() {
             : `<div class="players-empty">${icon("phone", "status-ic")}<p class="muted">Waiting for players — scan the QR or enter the code to join!</p></div>`}
         </div>
 
+        ${sessionBoard(players)}
+
         <h2 style="margin-top:4px">${players.length ? "Vote on your phones — the VIP picks!" : "Choose a game"}</h2>
         <div class="game-grid">
           ${(state.games || []).map((g) => gameCard(g, players.length)).join("")}
         </div>
       </div>
+    </div>`;
+}
+
+/* Session-wide leaderboard — the running total across every game played this
+ * party. Hidden until at least one game has awarded points, so the lobby isn't
+ * cluttered with a wall of zeroes before anyone has played. */
+function sessionBoard(players) {
+  const ranked = [...players]
+    .filter((p) => (p.score || 0) > 0)
+    .sort((a, b) => (b.score || 0) - (a.score || 0));
+  if (!ranked.length) return "";
+  return `
+    <div class="session-board">
+      <div class="sb-head">${icon("trophy", "sb-trophy")} Session leaderboard</div>
+      <ol class="sb-list">
+        ${ranked.map((p, i) => `
+          <li class="sb-row r${i < 3 ? i + 1 : "n"}">
+            <span class="sb-rank">${i + 1}</span>
+            <span class="avatar-dot" style="background:${p.color}"></span>
+            <span class="sb-name">${esc(p.name)}</span>
+            <span class="sb-score">${p.score || 0}</span>
+          </li>`).join("")}
+      </ol>
     </div>`;
 }
 

@@ -1,4 +1,4 @@
-import { shuffle, pick, leaderboard } from "./util.js";
+import { shuffle, pick } from "./util.js";
 
 /* Reflex Rush — a mix of fast reaction minigames, one per round. */
 
@@ -130,7 +130,7 @@ export default {
   },
 
   hostView(state, ctx) {
-    if (state.screen === "final") return { screen: "final", leaderboard: leaderboard(ctx.players()) };
+    if (state.screen === "final") return { screen: "final", leaderboard: ctx.gameLeaderboard() };
     const base = {
       screen: state.screen, type: state.type, round: state.round, total: state.totalRounds,
       tapped: Object.keys(state.taps).length, players: ctx.players().length,
@@ -144,14 +144,14 @@ export default {
       base.results = state.roundResults;
       base.missed = state.missed;
       base.wrongLabel = state.type === "greenlight" ? "Too early" : "Missed / too early";
-      base.leaderboard = leaderboard(ctx.players());
+      base.leaderboard = ctx.gameLeaderboard();
     }
     return base;
   },
 
   playerView(state, playerId, ctx) {
     if (state.screen === "final") {
-      const lb = leaderboard(ctx.players());
+      const lb = ctx.gameLeaderboard();
       return { screen: "final", rank: lb.findIndex((p) => p.id === playerId) + 1, total: lb.length };
     }
     const mine = state.taps[playerId];
