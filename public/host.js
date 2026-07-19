@@ -44,7 +44,10 @@ function screenChanged(sig) {
 }
 
 function render() {
-  if (!state) { app.innerHTML = `<div class="center"><span style="color:var(--cyan)">${icon("power", "status-ic")}</span><h2>Starting up…</h2></div>`; lastKey = null; lastScreenSig = null; return; }
+  if (!state) { app.innerHTML = `<div class="center"><span style="color:var(--cyan)">${icon("power", "status-ic")}</span><h2>Starting up…</h2></div>`; lastKey = null; lastScreenSig = null; document.body.dataset.phase = ""; return; }
+  // Only gameplay screens are locked to the viewport (see CSS). Lobby and game
+  // hubs may be taller than the screen, so they must stay scrollable.
+  document.body.dataset.phase = state.phase;
   if (state.phase === "lobby") { lastKey = null; return renderLobby(); }
   if (state.phase === "hub") { lastKey = null; return renderHub(); }
   return renderGame();

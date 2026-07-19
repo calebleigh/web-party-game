@@ -790,8 +790,11 @@ body::before {
 .hub-group { flex-basis: 100%; width: 100%; text-align: center; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: var(--yellow); margin-top: 10px; }
 .hub-group:first-child { margin-top: 0; }
 
-/* The main (host) screen is a fixed stage — it must never scroll. Phones
- * (body.player) still scroll normally. */
-body.host { overflow: hidden; }
-body.host #app, body.host .host-shell { height: 100dvh; min-height: 0; }
-.host-main { min-height: 0; overflow: hidden; }
+/* In-game screens are a fixed stage locked to the viewport so the whole room
+ * sees everything at once — content is sized to fit rather than scroll. The
+ * lobby and game hubs (which can be taller than the screen) stay scrollable,
+ * and phones (body.player) always scroll normally. */
+body.host[data-phase="game"] { overflow: hidden; }
+body.host[data-phase="game"] #app,
+body.host[data-phase="game"] .host-shell { height: 100dvh; min-height: 0; }
+body.host[data-phase="game"] .host-main { min-height: 0; overflow: hidden; }
