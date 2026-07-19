@@ -533,6 +533,12 @@ function viewTrivia(g) {
     }
     return c;
   };
+  const silhouette = g.silhouette != null ? `
+    <div class="silhouette-wrap">
+      <img class="silhouette-img${g.screen === "reveal" ? " revealed" : ""}"
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${g.silhouette}.png" alt="" />
+      ${g.answerName ? `<div class="silhouette-name">It's ${esc(g.answerName)}!</div>` : ""}
+    </div>` : "";
   return `
     <div style="display:flex;align-items:center;gap:20px">
       <span class="pill">Question ${g.qNum}/${g.total}</span>
@@ -540,6 +546,7 @@ function viewTrivia(g) {
       ${g.screen === "question" ? `<span class="pill">${g.answered}/${g.players} answered</span>` : ""}
     </div>
     <div class="big-prompt">${esc(g.question)}</div>
+    ${silhouette}
     <div class="opt-grid">
       ${g.options.map((o, i) => `<div class="${optClasses(i)}">
         ${icon(["tri", "diamond", "circle", "square"][i])} ${esc(o)}

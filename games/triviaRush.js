@@ -77,6 +77,7 @@ const QUESTIONS = {
 const CATEGORY_LABEL = {
   mixed: "Mixed", science: "Science", geography: "Geography", history: "History",
   animals: "Animals", entertainment: "Screen & Fun", sports: "Sports", food: "Food & Drink",
+  disney: "Disney", starwars: "Star Wars", pokemon: "Pokémon", gaming: "Gaming",
 };
 
 // Additional verified questions merged into the banks above.
@@ -238,6 +239,80 @@ const MORE2 = {
 };
 for (const c of Object.keys(MORE2)) if (QUESTIONS[c]) QUESTIONS[c].push(...MORE2[c]);
 
+// Pop-culture categories — new selectable categories that also feed the Mixed pool.
+// Pokémon includes "Who's that Pokémon?" silhouette rounds: a question with a
+// `silhouette` dex number renders the official artwork as a black silhouette
+// (host applies a brightness(0) filter) that reveals in full color on the answer.
+const POP = {
+  disney: [
+    { q: "What is the name of the snowman in Frozen?", options: ["Olaf", "Sven", "Kristoff", "Hans"], answer: 0 },
+    { q: "In The Lion King, who is Simba's father?", options: ["Scar", "Zazu", "Rafiki", "Mufasa"], answer: 3 },
+    { q: "In Toy Story, what type of toy is Woody?", options: ["Astronaut", "Dinosaur", "Cowboy", "Pig"], answer: 2 },
+    { q: "In Moana, what kind of animal is Heihei?", options: ["Rooster", "Pig", "Goat", "Crab"], answer: 0 },
+    { q: "What is the family's surname in Encanto?", options: ["Herrera", "Madrigal", "Guevara", "Morales"], answer: 1 },
+    { q: "In Finding Nemo, what type of fish is Nemo?", options: ["Blue tang", "Goldfish", "Clownfish", "Shark"], answer: 2 },
+    { q: "What is the name of the mermaid in The Little Mermaid?", options: ["Jasmine", "Aurora", "Tiana", "Ariel"], answer: 3 },
+    { q: "In Aladdin, where does the Genie live?", options: ["A lamp", "A ring", "A bottle", "A cave"], answer: 0 },
+    { q: "In Beauty and the Beast, which character is the enchanted candelabra?", options: ["Cogsworth", "Lumière", "Mrs. Potts", "Chip"], answer: 1 },
+    { q: "In Toy Story, which character is a space ranger action figure?", options: ["Woody", "Rex", "Buzz Lightyear", "Hamm"], answer: 2 },
+    { q: "Which hit song is from the movie Encanto?", options: ["How Far I'll Go", "Let It Go", "Surface Pressure", "We Don't Talk About Bruno"], answer: 3 },
+    { q: "In Frozen, who is Elsa's younger sister?", options: ["Merida", "Anna", "Rapunzel", "Belle"], answer: 1 },
+  ],
+  starwars: [
+    { q: "Who is revealed to be Luke Skywalker's father?", options: ["Obi-Wan Kenobi", "Darth Vader", "Yoda", "Han Solo"], answer: 1 },
+    { q: "What is the name of Han Solo's ship?", options: ["X-Wing", "Star Destroyer", "Millennium Falcon", "Star Cruiser"], answer: 2 },
+    { q: "What is the name of the small, green Jedi Master?", options: ["Mace Windu", "Yoda", "Qui-Gon Jinn", "Palpatine"], answer: 1 },
+    { q: "What kind of creature is Chewbacca?", options: ["Wookiee", "Ewok", "Jawa", "Droid"], answer: 0 },
+    { q: "Which weapon is associated with the Jedi?", options: ["Blaster", "Lightsaber", "Bowcaster", "Thermal detonator"], answer: 1 },
+    { q: "Who trained Anakin Skywalker as a Padawan?", options: ["Yoda", "Mace Windu", "Obi-Wan Kenobi", "Count Dooku"], answer: 2 },
+    { q: "On which desert planet did Luke Skywalker grow up?", options: ["Hoth", "Endor", "Naboo", "Tatooine"], answer: 3 },
+    { q: "In the sequel trilogy, who is the scavenger heroine?", options: ["Rey", "Jyn", "Padmé", "Leia"], answer: 0 },
+    { q: "Which of these is the golden protocol droid?", options: ["R2-D2", "BB-8", "K-2SO", "C-3PO"], answer: 3 },
+    { q: "What is the evil galactic regime in the original trilogy called?", options: ["The Republic", "The Rebellion", "The Empire", "The Resistance"], answer: 2 },
+    { q: "What is Darth Vader's real name?", options: ["Anakin Skywalker", "Ben Solo", "Sheev Palpatine", "Boba Fett"], answer: 0 },
+    { q: "In the sequel trilogy, who is the masked villain and son of Han and Leia?", options: ["Finn", "Poe Dameron", "Snoke", "Kylo Ren"], answer: 3 },
+  ],
+  pokemon: [
+    { q: "What type is Pikachu?", options: ["Fire", "Grass", "Water", "Electric"], answer: 3 },
+    { q: "What does Charmander evolve into first?", options: ["Charizard", "Charmeleon", "Wartortle", "Ivysaur"], answer: 1 },
+    { q: "What is Charmander's final evolution?", options: ["Blastoise", "Venusaur", "Charizard", "Charmeleon"], answer: 2 },
+    { q: "Which Pokémon is the mascot of the franchise?", options: ["Pikachu", "Charizard", "Mewtwo", "Eevee"], answer: 0 },
+    { q: "What is Bulbasaur's primary type?", options: ["Fire", "Water", "Electric", "Grass"], answer: 3 },
+    { q: "What type is Squirtle?", options: ["Fire", "Water", "Grass", "Rock"], answer: 1 },
+    { q: "What item is used to catch a Pokémon?", options: ["Potion", "Berry", "Poké Ball", "Gym Badge"], answer: 2 },
+    { q: "Eevee is famous for having many of what?", options: ["Evolutions", "Types", "Moves", "Colors"], answer: 0 },
+    { q: "Which legendary Pokémon was created from Mew's DNA?", options: ["Lugia", "Mewtwo", "Rayquaza", "Zapdos"], answer: 1 },
+    { q: "In the anime, who is the main trainer traveling with Pikachu?", options: ["Brock", "Misty", "Gary", "Ash Ketchum"], answer: 3 },
+    { q: "Which is the Water-type starter in the Kanto region?", options: ["Squirtle", "Charmander", "Bulbasaur", "Pikachu"], answer: 0 },
+    { q: "What color is Pikachu?", options: ["Red", "Blue", "Yellow", "Green"], answer: 2 },
+    { q: "Who's that Pokémon?", silhouette: 25, options: ["Pikachu", "Raichu", "Pichu", "Plusle"], answer: 0 },
+    { q: "Who's that Pokémon?", silhouette: 6, options: ["Charmeleon", "Charizard", "Dragonite", "Salamence"], answer: 1 },
+    { q: "Who's that Pokémon?", silhouette: 1, options: ["Chikorita", "Oddish", "Bulbasaur", "Treecko"], answer: 2 },
+    { q: "Who's that Pokémon?", silhouette: 7, options: ["Totodile", "Mudkip", "Piplup", "Squirtle"], answer: 3 },
+    { q: "Who's that Pokémon?", silhouette: 39, options: ["Jigglypuff", "Clefairy", "Chansey", "Wigglytuff"], answer: 0 },
+    { q: "Who's that Pokémon?", silhouette: 143, options: ["Munchlax", "Snorlax", "Golem", "Rhydon"], answer: 1 },
+    { q: "Who's that Pokémon?", silhouette: 94, options: ["Haunter", "Misdreavus", "Gengar", "Banette"], answer: 2 },
+    { q: "Who's that Pokémon?", silhouette: 133, options: ["Growlithe", "Vulpix", "Furret", "Eevee"], answer: 3 },
+    { q: "Who's that Pokémon?", silhouette: 150, options: ["Mewtwo", "Mew", "Deoxys", "Lugia"], answer: 0 },
+    { q: "Who's that Pokémon?", silhouette: 129, options: ["Feebas", "Magikarp", "Goldeen", "Remoraid"], answer: 1 },
+  ],
+  gaming: [
+    { q: "What is Mario's profession?", options: ["Chef", "Doctor", "Carpenter", "Plumber"], answer: 3 },
+    { q: "What is the name of Mario's brother?", options: ["Luigi", "Wario", "Toad", "Yoshi"], answer: 0 },
+    { q: "In The Legend of Zelda, what is the name of the hero?", options: ["Zelda", "Ganon", "Link", "Epona"], answer: 2 },
+    { q: "In Minecraft, which hostile creature explodes?", options: ["Zombie", "Creeper", "Skeleton", "Enderman"], answer: 1 },
+    { q: "What color is Sonic the Hedgehog?", options: ["Red", "Green", "Yellow", "Blue"], answer: 3 },
+    { q: "In Pac-Man, what does Pac-Man eat to turn the tables on the ghosts?", options: ["Power pellets", "Cherries", "Keys", "Bells"], answer: 0 },
+    { q: "What are the falling shapes in Tetris called?", options: ["Spheres", "Tetrominoes", "Triangles", "Stars"], answer: 1 },
+    { q: "In Fortnite, what closing hazard forces players together?", options: ["The Fog", "The Wall", "The Storm", "The Grid"], answer: 2 },
+    { q: "Which company created Super Mario?", options: ["Sega", "Sony", "Microsoft", "Nintendo"], answer: 3 },
+    { q: "Which gem is used to craft some of the strongest tools in Minecraft?", options: ["Diamond", "Ruby", "Emerald", "Sapphire"], answer: 0 },
+    { q: "Which princess does Mario often rescue?", options: ["Daisy", "Peach", "Rosalina", "Zelda"], answer: 1 },
+    { q: "In Mario games, collecting 100 of what gives an extra life?", options: ["Stars", "Mushrooms", "Coins", "Flowers"], answer: 2 },
+  ],
+};
+Object.assign(QUESTIONS, POP);
+
 const QUESTION_MS = 15_000;
 const REVEAL_MS = 4_000;
 
@@ -306,6 +381,10 @@ export default {
         { id: "entertainment", label: "Screen & Fun" },
         { id: "sports", label: "Sports" },
         { id: "food", label: "Food & Drink" },
+        { id: "disney", label: "Disney" },
+        { id: "starwars", label: "Star Wars" },
+        { id: "pokemon", label: "Pokémon" },
+        { id: "gaming", label: "Gaming" },
       ],
     },
     {
@@ -360,6 +439,8 @@ export default {
       total: state.questions.length,
       question: q.q,
       options: q.options,
+      silhouette: q.silhouette != null ? q.silhouette : null,
+      answerName: state.screen === "reveal" && q.silhouette != null ? q.options[q.answer] : null,
       timeLeft,
       answered: Object.keys(state.answers).length,
       players: ctx.players().length,
