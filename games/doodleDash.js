@@ -1,40 +1,11 @@
 import { shuffle, pick, normalize, countIn, timesUp } from "./util.js";
+import { DOODLE_PACKS } from "./data/doodleWords.js";
 
 /* Doodle Dash — one player draws a secret word; everyone else races to guess it. */
 
-const WORDS = [
-  "cat", "dog", "house", "tree", "sun", "star", "fish", "car", "boat", "flower",
-  "apple", "banana", "pizza", "cake", "ice cream", "snowman", "robot", "rocket",
-  "ghost", "spider", "snake", "butterfly", "umbrella", "guitar", "hat", "shoe",
-  "key", "clock", "book", "cup", "balloon", "kite", "rainbow", "cloud", "moon",
-  "heart", "crown", "castle", "dragon", "dinosaur", "elephant", "giraffe",
-  "penguin", "owl", "bee", "frog", "turtle", "whale", "camera", "phone",
-  "glasses", "chair", "ladder", "lighthouse", "cactus", "mushroom", "anchor",
-  "wizard", "mermaid", "unicorn", "volcano", "bicycle", "train", "airplane",
-  "hamburger", "donut", "candle", "scissors", "hammer", "tent", "windmill",
-];
-
-// Themed word packs let the room pick a vibe (and keep games from repeating).
-const PACKS = {
-  classic: WORDS,
-  animals: [
-    "cat", "dog", "fish", "snake", "spider", "butterfly", "bee", "frog", "turtle",
-    "whale", "penguin", "owl", "elephant", "giraffe", "dragon", "dinosaur", "unicorn",
-    "mermaid", "shark", "crab", "octopus", "panda", "tiger", "lion", "monkey",
-    "rabbit", "horse", "cow", "snail", "kangaroo", "hedgehog", "flamingo", "peacock",
-  ],
-  food: [
-    "apple", "banana", "pizza", "cake", "ice cream", "hamburger", "donut", "hot dog",
-    "taco", "sushi", "cookie", "cupcake", "popcorn", "pineapple", "strawberry",
-    "carrot", "cheese", "egg", "bread", "sandwich", "watermelon", "lollipop",
-    "pancakes", "fries", "coffee", "grapes", "corn", "pretzel", "waffle", "burrito",
-  ],
-  places: [
-    "house", "castle", "lighthouse", "volcano", "windmill", "tent", "bridge", "beach",
-    "mountain", "island", "city", "farm", "pyramid", "igloo", "cave", "waterfall",
-    "desert", "forest", "harbor", "skyscraper", "treehouse", "barn", "tower", "cabin",
-  ],
-};
+// ~1,100 drawable words across themed packs (classic = everything) live in a
+// data module so a long session almost never repeats a word.
+const PACKS = DOODLE_PACKS;
 
 const RESULT_MS = 6_000;
 
