@@ -77,7 +77,7 @@ window.pickColor = pickColor;
 function renderJoin() {
   app.innerHTML = `
     <div class="center">
-      <div class="logo">Shindig<span class="bang">!</span></div>
+      <div class="logo cc-logo">${icon("couch", "couch-glyph")}<span class="cc-words">Couch <span class="cc-accent">Clash</span></span></div>
       <p class="muted" style="font-size:1.2rem">Enter the code on the big screen</p>
       <div class="card" style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px">
         <input class="field" id="code" maxlength="4" placeholder="CODE" value="${esc(me.code)}"

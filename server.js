@@ -600,7 +600,7 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
-  console.log(`\n  🎉  Shindig! running!`);
+  console.log(`\n  🛋️  Couch Clash running!`);
   console.log(`  📺  Main screen:  http://localhost:${PORT}`);
   console.log(`  📱  Players join: http://localhost:${PORT}/play\n`);
 });

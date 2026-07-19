@@ -1,4 +1,4 @@
-# 🎉 Shindig!
+# 🛋️ Couch Clash
 
 A bright, friendly, Jackbox-style party game platform. One **main screen** shows the
 game; everyone else joins from their **phones** with a 4-letter room code — just like
