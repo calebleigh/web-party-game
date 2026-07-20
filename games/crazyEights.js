@@ -215,6 +215,7 @@ export default {
       turnName: ctx.player(state.turnId)?.name,
       top: state.topCard,
       suit: state.currentSuit,
+      discardCount: state.discard.length,
       hand: hand.map((c) => ({ ...c, playable: active && playable(c, state.topCard, state.currentSuit) })),
       canPlay: active && hasPlay(state.hands[playerId], state.topCard, state.currentSuit),
     };

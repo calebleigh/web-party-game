@@ -549,7 +549,8 @@ function pCrazyEights(g) {
   const isRed = (s) => s === "♥" || s === "♦";
   if (!g.myTurn) window._ceBusy = false; // turn passed — re-enable input
   if (window._ce8 && (!g.myTurn || !g.hand.some((c) => c.id === window._ce8))) window._ce8 = null;
-  const topHtml = `<div class="ce-top">${cardFace(g.top, "big")}<div class="ce-suit-lbl">Match suit <span style="color:${isRed(g.suit) ? "var(--red)" : "var(--ink)"}">${g.suit}</span></div></div>`;
+  const under = (n) => Array.from({ length: Math.min(3, Math.max(0, n)) }, (_, i) => `<div class="ce-under u${i + 1}"></div>`).join("");
+  const topHtml = `<div class="ce-top"><div class="ce-stack">${under((g.discardCount || 1) - 1)}${cardFace(g.top, "big")}</div><div class="ce-suit-lbl">Match suit <span style="color:${isRed(g.suit) ? "var(--red)" : "var(--ink)"}">${g.suit}</span></div></div>`;
   const handHtml = (interactive) => `<div class="ce-hand">${g.hand.map((c) => {
     const tappable = interactive && c.playable && !window._ceBusy && !window._ce8;
     return `<button class="pcard ${isRed(c.suit) ? "red" : "black"} ${c.playable ? "playable" : "dim"}" ${tappable ? `onclick="playCard('${c.id}',${c.rank === "8"},this)"` : "disabled"}><span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span></button>`;
