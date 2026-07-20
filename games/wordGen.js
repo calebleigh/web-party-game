@@ -35,6 +35,13 @@ const COMMON3 = new Set(("abs ace act add ads age ago aid aim air all amp and an
   "tip toe ton too top toy try tub two use van vat vet via war was wax way web wed wet who why wig win wit won " +
   "wow yen yes yet you zip zoo").split(" "));
 
+// Junk that slips through the source dict at 4+ letters: names, abbreviations,
+// foreign words, and obscure/archaic entries. Removed at every length so they
+// never surface as a bank word or a findable answer. (e.g. SEPT, KENO, THOU.)
+const BLOCK = new Set(("alan anna beth brad carl chad cole gage hart jake jane jill john josh kent kirk lang marc " +
+  "matt mike rick ruth shaw tony troy fuji hong casa ciao sept comp libs midi para poly anti bios sims hist cant " +
+  "keno soma rand sans thee thou thru jews gays").split(" "));
+
 function letterCounts(word) {
   const c = {};
   for (const ch of word) c[ch] = (c[ch] || 0) + 1;
@@ -66,7 +73,8 @@ try {
   const words = raw.split(/\r?\n/)
     .map((w) => w.trim().toLowerCase())
     .filter((w) => /^[a-z]+$/.test(w) && w.length >= 3)
-    .filter((w) => w.length !== 3 || COMMON3.has(w)); // drop junk 3-letter words
+    .filter((w) => w.length !== 3 || COMMON3.has(w)) // 3-letter words: allowlist only
+    .filter((w) => !BLOCK.has(w));                   // drop known junk at any length
   for (const w of words) DICT.add(w);
   for (const w of words) {
     const n = w.length;
