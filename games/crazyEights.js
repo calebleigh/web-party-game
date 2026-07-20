@@ -43,6 +43,7 @@ function beginTurn(state, ctx) {
   if (state.screen === "final") return;
   state.screen = "play";
   state.drewThisTurn = false;
+  state.locked = false; // set once a move resolves, so no second move sneaks in before the turn advances
   state.lastAction = null;
   const cur = state.turnId;
   state.canPlay = hasPlay(state.hands[cur], state.topCard, state.currentSuit);
@@ -78,6 +79,7 @@ function doPlay(state, ctx, pid, cardId, suit) {
   if (idx < 0) return;
   const card = hand[idx];
   if (!playable(card, state.topCard, state.currentSuit)) return;
+  state.locked = true; // lock the turn the instant a valid play lands
   hand.splice(idx, 1);
   state.discard.push(card);
   state.topCard = card;
@@ -96,6 +98,7 @@ function doDraw(state, ctx, pid) {
   const p = ctx.player(pid);
   if (state.deck.length === 0) {
     // Nothing to draw and no play — pass.
+    state.locked = true;
     state.log.unshift({ text: `${p?.name} couldn't play — passed`, color: p?.color });
     state.log = state.log.slice(0, 6);
     ctx.sync();
@@ -114,6 +117,7 @@ function doDraw(state, ctx, pid) {
     const dl = state.endsAt;
     state.timer = ctx.after(TURN_MS, () => { if (state.screen === "play" && state.turnId === pid && state.endsAt === dl) autoPlay(state, ctx); });
   } else {
+    state.locked = true;
     state.log.unshift({ text: `${p?.name} drew a card — no play`, color: p?.color });
     state.log = state.log.slice(0, 6);
     ctx.sync();
@@ -160,7 +164,7 @@ export default {
   },
 
   onAction(state, playerId, action, ctx) {
-    if (state.screen !== "play" || playerId !== state.turnId) return;
+    if (state.screen !== "play" || playerId !== state.turnId || state.locked) return;
     if (action.type === "play") {
       doPlay(state, ctx, playerId, action.cardId, action.suit);
     } else if (action.type === "draw") {

@@ -547,26 +547,67 @@ window.sendImpNumber = () => {
 function pCrazyEights(g) {
   if (g.screen === "final") return finalP(g);
   const isRed = (s) => s === "♥" || s === "♦";
-  const topHtml = `<div class="ce-top">${cardFace(g.top, "big")}<div class="ce-suit-lbl">Match suit <span style="color:${isRed(g.suit) ? "var(--red)" : "var(--ink)"}">${g.suit}</span></div></div>`;
-  // Clear a stale pending-eight if it's no longer valid.
+  if (!g.myTurn) window._ceBusy = false; // turn passed — re-enable input
   if (window._ce8 && (!g.myTurn || !g.hand.some((c) => c.id === window._ce8))) window._ce8 = null;
-  if (g.myTurn && window._ce8) {
-    return `${topHtml}<p class="player-prompt">You played an 8 — pick the next suit:</p>
-      <div class="ce-suits">${["♠", "♥", "♦", "♣"].map((s) => `<button class="ce-suitbtn ${isRed(s) ? "red" : ""}" onclick="playEightSuit('${s}')">${s}</button>`).join("")}</div>`;
-  }
-  const handHtml = `<div class="ce-hand">${g.hand.map((c) => `<button class="pcard ${isRed(c.suit) ? "red" : "black"} ${c.playable ? "playable" : "dim"}" ${c.playable ? `onclick="playCard('${c.id}',${c.rank === "8"})"` : "disabled"}><span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span></button>`).join("")}</div>`;
+  const topHtml = `<div class="ce-top">${cardFace(g.top, "big")}<div class="ce-suit-lbl">Match suit <span style="color:${isRed(g.suit) ? "var(--red)" : "var(--ink)"}">${g.suit}</span></div></div>`;
+  const handHtml = (interactive) => `<div class="ce-hand">${g.hand.map((c) => {
+    const tappable = interactive && c.playable && !window._ceBusy && !window._ce8;
+    return `<button class="pcard ${isRed(c.suit) ? "red" : "black"} ${c.playable ? "playable" : "dim"}" ${tappable ? `onclick="playCard('${c.id}',${c.rank === "8"},this)"` : "disabled"}><span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span></button>`;
+  }).join("")}</div>`;
+
   if (g.myTurn) {
+    // Playing an 8 — a floating overlay (doesn't reflow the hand) with the suit
+    // counts so you can see which suit you hold most of.
+    let overlay = "";
+    if (window._ce8) {
+      const counts = { "♠": 0, "♥": 0, "♦": 0, "♣": 0 };
+      g.hand.forEach((c) => { if (c.rank !== "8") counts[c.suit]++; });
+      overlay = `<div class="ce-overlay"><div class="ce-overlay-panel">
+        <p class="player-prompt">You played an 8 — pick the next suit</p>
+        <div class="ce-suits">${["♠", "♥", "♦", "♣"].map((s) => `<button class="ce-suitbtn ${isRed(s) ? "red" : ""}" onclick="playEightSuit('${s}')">${s}<span class="ce-suitcount">${counts[s]}</span></button>`).join("")}</div>
+        <p class="muted">The number is how many of each suit you're holding.</p>
+      </div></div>`;
+    }
+    // Reserve the action-button row so the hand doesn't jump when Draw appears.
     return `${topHtml}
       <p class="player-prompt">Your turn! ${g.canPlay ? "Play a matching card or an 8." : "No match in hand…"}</p>
-      ${handHtml}
-      ${!g.canPlay ? `<button class="btn big purple" onclick="ceDraw()">Draw a card</button>` : ""}`;
+      ${handHtml(true)}
+      <div class="ce-action">${!g.canPlay ? `<button class="btn big purple" onclick="ceDraw()">Draw a card</button>` : ""}</div>
+      ${overlay}`;
   }
   return `${topHtml}
     <p class="muted">Waiting for <b>${esc(g.turnName)}</b> to play…</p>
-    ${handHtml}`;
+    ${handHtml(false)}
+    <div class="ce-action"></div>`;
 }
-window.playCard = (id, isEight) => { if (isEight) { window._ce8 = id; render(); } else act({ type: "play", cardId: id }); };
-window.playEightSuit = (s) => { if (window._ce8) { act({ type: "play", cardId: window._ce8, suit: s }); window._ce8 = null; } };
+
+/* Fly a clone of the tapped card up to the pile (survives the hand re-render). */
+function ceFlyToPile(el) {
+  const pile = document.querySelector(".ce-top .pcard");
+  if (!el || !pile) return;
+  const a = el.getBoundingClientRect(), b = pile.getBoundingClientRect();
+  const clone = document.createElement("div");
+  clone.className = "pcard " + (el.classList.contains("red") ? "red" : "black");
+  clone.innerHTML = el.innerHTML;
+  clone.style.cssText = `position:fixed;left:0;top:0;width:${a.width}px;height:${a.height}px;margin:0;z-index:999;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.5);transform:translate(${a.left}px,${a.top}px);transition:transform .34s cubic-bezier(.35,.7,.3,1),opacity .34s;`;
+  document.body.appendChild(clone);
+  requestAnimationFrame(() => {
+    clone.style.transform = `translate(${b.left}px,${b.top}px) scale(${b.width / a.width}) rotate(7deg)`;
+    clone.style.opacity = "0.55";
+  });
+  setTimeout(() => clone.remove(), 400);
+}
+
+window.playCard = (id, isEight, el) => {
+  if (window._ceBusy || window._ce8) return;
+  if (isEight) { window._ce8 = id; render(); return; }
+  window._ceBusy = true;
+  ceFlyToPile(el);
+  act({ type: "play", cardId: id });
+};
+window.playEightSuit = (s) => {
+  if (window._ce8 && !window._ceBusy) { window._ceBusy = true; act({ type: "play", cardId: window._ce8, suit: s }); window._ce8 = null; }
+};
 window.ceDraw = () => act({ type: "draw" });
 
 /* ---------------- REFLEX ---------------- */
