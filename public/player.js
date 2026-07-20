@@ -560,7 +560,7 @@ function pCrazyEights(g) {
     // Your move landed — brief calm state while the turn passes (no highlights,
     // no Draw button, hand not tappable).
     return `${topHtml}
-      <p class="player-prompt">Nice! Passing to the next player…</p>
+      <div class="ce-prompt">Nice! Passing to the next player…</div>
       ${handHtml(false)}
       <div class="ce-action"></div>`;
   }
@@ -579,13 +579,13 @@ function pCrazyEights(g) {
     }
     // Reserve the action-button row so the hand doesn't jump when Draw appears.
     return `${topHtml}
-      <p class="player-prompt">Your turn! ${g.canPlay ? "Play a matching card or an 8." : "No match in hand…"}</p>
+      <div class="ce-prompt">Your turn! ${g.canPlay ? "Play a matching card or an 8." : "No match in hand…"}</div>
       ${handHtml(true)}
       <div class="ce-action">${!g.canPlay ? `<button class="btn big purple" onclick="ceDraw()">Draw a card</button>` : ""}</div>
       ${overlay}`;
   }
   return `${topHtml}
-    <p class="muted">Waiting for <b>${esc(g.turnName)}</b> to play…</p>
+    <div class="ce-prompt muted-prompt">Waiting for <b>${esc(g.turnName)}</b> to play…</div>
     ${handHtml(false)}
     <div class="ce-action"></div>`;
 }
