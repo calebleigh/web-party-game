@@ -355,6 +355,7 @@ function renderGame() {
   const beforeTiles = captureTiles(".pool .tile"); // for the shuffle FLIP
   app.innerHTML = `<div class="host-shell">${header}<div class="host-main${enter}">${body}</div></div>${joinBadge()}`;
   playFlip(".pool .tile", beforeTiles);
+  if (state.gameId === "crazyEights" && g.screen === "play") ceHostFly(g);
 
   // Re-attach the doodle canvas and redraw from the stored strokes.
   if (state.gameId === "doodleDash" && g.screen === "draw") {
@@ -484,12 +485,51 @@ function viewCrazyEights(g) {
     </div>
     <div class="ce-players">
       ${g.players.map((p) => `
-        <div class="ce-seat ${p.isTurn ? "on" : ""} ${p.cards === 0 ? "out" : ""}">
+        <div class="ce-seat ${p.isTurn ? "on" : ""} ${p.cards === 0 ? "out" : ""}" data-pid="${p.id}">
           <div class="ce-fan">${Array.from({ length: Math.min(p.cards, 6) }).map(() => cardBack("mini")).join("")}</div>
           <div class="ce-seatname"><span class="avatar-dot" style="background:${p.color}"></span>${esc(p.name)} <b>${p.cards}</b></div>
         </div>`).join("")}
     </div>
     ${g.log && g.log.length ? `<div class="ce-log">${g.log.map((l) => `<div>${esc(l.text)}</div>`).join("")}</div>` : ""}`;
+}
+
+/* Fly a card between a player's seat and the pile on the big screen when a move
+ * lands. Deduped by move signature so the 1s clock re-renders don't replay it. */
+let ceFlySig = null;
+function ceHostFly(g) {
+  const la = g.lastAction;
+  if (!la || (la.type !== "play" && la.type !== "draw") || !la.pid) return;
+  const sig = `${la.type}:${la.pid}:${la.card ? la.card.id : g.pool}`;
+  if (sig === ceFlySig) return;
+  ceFlySig = sig;
+  const seat = document.querySelector(`.ce-seat[data-pid="${la.pid}"]`);
+  const piles = document.querySelectorAll(".ce-pile .pcard");
+  const deckEl = piles[0], pileEl = piles[1];
+  if (!seat || !deckEl || !pileEl) return;
+
+  if (la.type === "play" && la.card) {
+    fly(seat, pileEl, faceHTML(la.card), la.card.suit === "♥" || la.card.suit === "♦" ? "red" : "black", true);
+  } else if (la.type === "draw") {
+    fly(deckEl, seat, `<span class="pc-back-mark">♣</span>`, "back", false);
+  }
+
+  function faceHTML(c) { return `<span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span>`; }
+  function fly(fromEl, toEl, inner, cls, faceUp) {
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const w = pileEl.getBoundingClientRect().width, h = pileEl.getBoundingClientRect().height;
+    const clone = document.createElement("div");
+    clone.className = `pcard big ${cls}`;
+    clone.innerHTML = inner;
+    const cx = (r) => r.left + r.width / 2 - w / 2, cy = (r) => r.top + r.height / 2 - h / 2;
+    clone.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;margin:0;z-index:900;pointer-events:none;box-shadow:0 14px 34px rgba(0,0,0,.55);transform:translate(${cx(a)}px,${cy(a)}px) scale(${faceUp ? 0.5 : 0.62}) rotate(${faceUp ? -14 : 8}deg);opacity:0;transition:transform .44s cubic-bezier(.3,.82,.32,1),opacity .44s;`;
+    document.body.appendChild(clone);
+    requestAnimationFrame(() => {
+      clone.style.transform = `translate(${cx(b)}px,${cy(b)}px) scale(${faceUp ? 1 : 0.5}) rotate(${faceUp ? 4 : -6}deg)`;
+      clone.style.opacity = "1";
+    });
+    setTimeout(() => { clone.style.opacity = "0"; }, faceUp ? 430 : 380);
+    setTimeout(() => clone.remove(), 560);
+  }
 }
 
 /* ---------------- WORD HUNT ---------------- */
