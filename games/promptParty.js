@@ -138,6 +138,35 @@ ANSWER_CARDS.push(
   "A prancing pony", "Overinflated ego", "A chattering monkey", "The blue screen of death", "A spooky basement"
 );
 
+// Classic mode plays noun cards, so it needs judgment/superlative prompts where
+// ANY noun is a valid, funny answer (Apples-to-Apples style) — not the freedom
+// prompts, which expect a written phrase ("the worst thing to SAY…").
+const CLASSIC_PROMPTS = [
+  "The worst thing to find in your bed", "Most likely to ruin a family vacation", "The secret to a long and happy life",
+  "What the world could really do without", "The worst houseguest imaginable", "Scariest thing to meet in a dark alley",
+  "The worst possible birthday present", "What's really clogging the sink", "The true cause of all my problems",
+  "Most likely to show up uninvited", "The worst thing to step on at 3am", "What I'd sacrifice to the volcano",
+  "The real reason I'm running late", "The worst thing to keep as a pet", "What's hiding in the back of the fridge",
+  "The worst thing to bring to a job interview", "The most overrated thing in the world", "The worst superhero sidekick",
+  "What the aliens abducted", "The worst thing to name a baby", "The grossest thing at the potluck",
+  "What's living in the office ceiling", "The worst wedding gift", "Most likely to start a bar fight",
+  "The real reason I'm so tired", "What I found in the lost and found", "The worst thing to microwave",
+  "The mascot for my worst nightmare", "What ruined the picnic", "The worst thing to be reincarnated as",
+  "What's really in the mystery meat", "The worst thing to hand a toddler", "Most likely to be haunted",
+  "The worst thing to trip over in the dark", "What the cat dragged in", "The worst smell on an airplane",
+  "My spirit animal, apparently", "The worst thing to win in a raffle", "What's behind the locked basement door",
+  "The real MVP of the apocalypse", "What I most regret buying", "The worst thing scratching in the walls",
+  "Most likely to make a grown adult cry", "The worst thing to serve at a fancy dinner", "The worst thing to bring camping",
+  "What's clogging up my inbox", "The worst thing to keep in your bag", "The reason the party ended early",
+  "The worst thing to find in your shoe", "Most likely to survive the winter", "The worst gift for a coworker",
+  "What haunts the office bathroom", "The true villain of my morning", "What the dog buried in the yard",
+  "The worst thing to leave in a hot car", "Most likely to embarrass you in public", "The worst thing to find in your soup",
+  "The reason the neighbors complained", "What I keep meaning to throw out", "The grossest thing in the gym",
+  "What crawled out of the drain", "The worst thing to inherit", "Most likely to cause a scene at the DMV",
+  "The worst thing to find in a vending machine", "What the fortune cookie warned me about", "The worst thing to adopt",
+  "The worst roommate you could ask for", "What's really under the couch cushions", "The worst thing to keep on your desk",
+];
+
 const ANSWER_MS = 45_000;
 const VOTE_MS = 30_000;
 const REVEAL_MS = 7_000;
@@ -255,7 +284,8 @@ export default {
   start(state, ctx, config = {}) {
     state.mode = config.mode === "classic" ? "classic" : "freedom";
     const n = parseInt(config.rounds, 10) || 3;
-    state.prompts = sample(PROMPTS, Math.min(n, PROMPTS.length));
+    const promptPool = state.mode === "classic" ? CLASSIC_PROMPTS : PROMPTS;
+    state.prompts = sample(promptPool, Math.min(n, promptPool.length));
     state.index = 0;
     if (state.mode === "classic") {
       state.deck = shuffle(ANSWER_CARDS.slice());

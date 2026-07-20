@@ -1,5 +1,5 @@
 import { shuffle, pick, normalize, countIn, timesUp } from "./util.js";
-import { DOODLE_PACKS } from "./data/doodleWords.js";
+import { DOODLE_PACKS, DOODLE_EASY } from "./data/doodleWords.js";
 
 /* Doodle Dash — one player draws a secret word; everyone else races to guess it. */
 
@@ -74,6 +74,13 @@ export default {
   ],
   options: [
     {
+      key: "difficulty", label: "Difficulty", default: "normal",
+      choices: [
+        { id: "easy", label: "Easy", hint: "Simple everyday things" },
+        { id: "normal", label: "Normal", hint: "The full word packs" },
+      ],
+    },
+    {
       key: "pack", label: "Word pack", default: "classic",
       choices: [
         { id: "classic", label: "Classic", hint: "A bit of everything" },
@@ -93,7 +100,10 @@ export default {
   ],
 
   start(state, ctx, config = {}) {
-    state.wordBank = (PACKS[config.pack] || PACKS.classic).slice();
+    // Easy overrides the theme pack with a simple, always-guessable word set.
+    state.wordBank = config.difficulty === "easy"
+      ? DOODLE_EASY.slice()
+      : (PACKS[config.pack] || PACKS.classic).slice();
     state.drawMs = (parseInt(config.drawtime, 10) || 70) * 1000;
     const laps = parseInt(config.laps, 10) || 1;
     state.order = shuffle(ctx.players().map((p) => p.id));

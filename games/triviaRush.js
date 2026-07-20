@@ -627,21 +627,27 @@ function startQuestion(state, ctx) {
   state.answers = {};
   state.startedAt = ctx.now();
   state.endsAt = ctx.now() + QUESTION_MS;
+  // A per-question token: every timer captures it and no-ops if a newer
+  // question (or reveal) has since started. Guards against any stale timer
+  // firing into a later round (e.g. an early "times up").
+  const token = (state.qToken || 0) + 1;
+  state.qToken = token;
   ctx.sync();
 
-  const deadline = state.endsAt;
-  ctx.after(QUESTION_MS, () => { if (state.screen === "question" && state.endsAt === deadline) timesUp(state, ctx, () => revealQuestion(state, ctx)); });
+  ctx.after(QUESTION_MS, () => { if (state.screen === "question" && state.qToken === token) timesUp(state, ctx, () => revealQuestion(state, ctx, token)); });
   const tick = () => {
-    if (state.screen !== "question") return;
+    if (state.screen !== "question" || state.qToken !== token) return;
     ctx.syncHost();
     ctx.after(1000, tick);
   };
   ctx.after(1000, tick);
 }
 
-function revealQuestion(state, ctx) {
+function revealQuestion(state, ctx, token) {
   if (state.screen === "reveal") return;
+  if (token != null && token !== state.qToken) return; // a newer question already started
   state.screen = "reveal";
+  const revealToken = state.qToken;
   const q = state.questions[state.index];
   for (const [pid, a] of Object.entries(state.answers)) {
     if (a.choice === q.answer) {
@@ -653,6 +659,7 @@ function revealQuestion(state, ctx) {
   ctx.sync();
 
   ctx.after(REVEAL_MS, () => {
+    if (state.qToken !== revealToken) return; // stale reveal — a newer question is live
     state.index++;
     if (state.index >= state.questions.length) {
       state.screen = "final";
@@ -726,7 +733,7 @@ export default {
     state.answers[playerId] = { choice, at: ctx.now() };
 
     if (ctx.players().every((p) => state.answers[p.id])) {
-      revealQuestion(state, ctx);
+      revealQuestion(state, ctx, state.qToken);
     } else {
       ctx.sync();
     }

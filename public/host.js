@@ -199,9 +199,13 @@ function lobbyGrid(games, playerCount) {
       ${cards.map((g) => gameCard(g, playerCount)).join("")}
     </div>`;
   }
+  // Card games live inside the hub tile, so surface their votes on it — else a
+  // vote for Crazy Eights would be invisible on the main lobby screen.
+  const cardVotes = cards.reduce((s, g) => s + ((state.votes || {})[g.id] || 0), 0);
   return `<div class="game-grid">
     ${main.map((g) => gameCard(g, playerCount)).join("")}
     ${cards.length ? `<div class="game-card" onclick="openCardHub()">
+      ${cardVotes ? `<span class="vote-badge">${cardVotes} ${cardVotes === 1 ? "vote" : "votes"}</span>` : ""}
       <span style="color:var(--purple)">${icon("cards", "game-ic")}</span>
       <h3>Card Games</h3>
       <p>Classic card games — Crazy Eights &amp; more</p>
