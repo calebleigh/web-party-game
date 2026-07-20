@@ -190,6 +190,7 @@ export default {
       top: state.topCard,
       suit: state.currentSuit,
       pool: state.deck.length,
+      discardCount: state.discard.length,
       players: ctx.players().map((p) => ({ id: p.id, name: p.name, color: p.color, cards: state.hands[p.id].length, isTurn: p.id === state.turnId })),
       log: state.log,
       lastAction: state.lastAction,

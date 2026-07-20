@@ -477,11 +477,12 @@ function viewCrazyEights(g) {
     </div>`;
   }
   const pop = g.lastAction && g.lastAction.type === "play" ? " ce-pop" : "";
+  const under = (n) => Array.from({ length: Math.min(3, Math.max(0, n)) }, (_, i) => `<div class="ce-under u${i + 1}"></div>`).join("");
   return `
     <div class="ce-turnbar"><span class="pill" style="border:2px solid ${g.turnColor};color:${g.turnColor}">${esc(g.turnName)}'s turn</span>${timerRing(g.timeLeft)}</div>
     <div class="ce-center">
-      <div class="ce-pile"><div class="ce-label">Deck</div>${cardBack()}<span class="ce-count">${g.pool}</span></div>
-      <div class="ce-pile"><div class="ce-label">Pile</div>${cardFace(g.top, "big" + pop)}<div class="ce-suit" style="color:${suitColor(g.suit)}">Suit ${g.suit}</div></div>
+      <div class="ce-pile"><div class="ce-label">Deck</div><div class="ce-stack">${under(g.pool - 1)}${g.pool > 0 ? cardBack("big") : `<div class="ce-empty"></div>`}</div><span class="ce-count">${g.pool}</span></div>
+      <div class="ce-pile"><div class="ce-label">Pile</div><div class="ce-stack">${under((g.discardCount || 1) - 1)}${cardFace(g.top, "big" + pop)}</div><div class="ce-suit" style="color:${suitColor(g.suit)}">Suit ${g.suit}</div></div>
     </div>
     <div class="ce-players">
       ${g.players.map((p) => `
@@ -503,32 +504,42 @@ function ceHostFly(g) {
   if (sig === ceFlySig) return;
   ceFlySig = sig;
   const seat = document.querySelector(`.ce-seat[data-pid="${la.pid}"]`);
-  const piles = document.querySelectorAll(".ce-pile .pcard");
+  const piles = document.querySelectorAll(".ce-pile .ce-stack");
   const deckEl = piles[0], pileEl = piles[1];
   if (!seat || !deckEl || !pileEl) return;
+  const fan = seat.querySelector(".ce-fan") || seat;
 
   if (la.type === "play" && la.card) {
-    fly(seat, pileEl, faceHTML(la.card), la.card.suit === "♥" || la.card.suit === "♦" ? "red" : "black", true);
+    // Card leaves the player's hand (their fan) and grows onto the discard pile.
+    fly(fan, pileEl, faceHTML(la.card), la.card.suit === "♥" || la.card.suit === "♦" ? "red" : "black", "play");
   } else if (la.type === "draw") {
-    fly(deckEl, seat, `<span class="pc-back-mark">♣</span>`, "back", false);
+    // A card back slides off the deck and shrinks into the player's hand.
+    fly(deckEl, fan, `<span class="pc-back-mark">♣</span>`, "back", "draw");
   }
 
   function faceHTML(c) { return `<span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span>`; }
-  function fly(fromEl, toEl, inner, cls, faceUp) {
+  function fly(fromEl, toEl, inner, cls, kind) {
+    const play = kind === "play";
     const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
     const w = pileEl.getBoundingClientRect().width, h = pileEl.getBoundingClientRect().height;
     const clone = document.createElement("div");
     clone.className = `pcard big ${cls}`;
     clone.innerHTML = inner;
     const cx = (r) => r.left + r.width / 2 - w / 2, cy = (r) => r.top + r.height / 2 - h / 2;
-    clone.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;margin:0;z-index:900;pointer-events:none;box-shadow:0 14px 34px rgba(0,0,0,.55);transform:translate(${cx(a)}px,${cy(a)}px) scale(${faceUp ? 0.5 : 0.62}) rotate(${faceUp ? -14 : 8}deg);opacity:0;transition:transform .44s cubic-bezier(.3,.82,.32,1),opacity .44s;`;
+    // Start scaled to hand-size at the source; grow (play) or shrink (draw) to the target.
+    const from = play ? 0.42 : 1, to = play ? 1 : 0.34;
+    clone.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;margin:0;z-index:900;pointer-events:none;box-shadow:0 16px 36px rgba(0,0,0,.6);transform:translate(${cx(a)}px,${cy(a)}px) scale(${from}) rotate(${play ? -16 : 6}deg);opacity:1;transition:transform .46s cubic-bezier(.34,.8,.3,1),opacity .3s ease;`;
     document.body.appendChild(clone);
     requestAnimationFrame(() => {
-      clone.style.transform = `translate(${cx(b)}px,${cy(b)}px) scale(${faceUp ? 1 : 0.5}) rotate(${faceUp ? 4 : -6}deg)`;
-      clone.style.opacity = "1";
+      clone.style.transform = `translate(${cx(b)}px,${cy(b)}px) scale(${to}) rotate(${play ? 3 : -4}deg)`;
     });
-    setTimeout(() => { clone.style.opacity = "0"; }, faceUp ? 430 : 380);
-    setTimeout(() => clone.remove(), 560);
+    if (play) {
+      // Land solid — the real pile card (identical) is underneath, so just remove.
+      setTimeout(() => clone.remove(), 500);
+    } else {
+      setTimeout(() => { clone.style.opacity = "0"; }, 330);
+      setTimeout(() => clone.remove(), 520);
+    }
   }
 }
 

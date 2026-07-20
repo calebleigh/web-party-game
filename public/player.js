@@ -597,13 +597,14 @@ function ceFlyToPile(el) {
   const clone = document.createElement("div");
   clone.className = "pcard " + (el.classList.contains("red") ? "red" : "black");
   clone.innerHTML = el.innerHTML;
-  clone.style.cssText = `position:fixed;left:0;top:0;width:${a.width}px;height:${a.height}px;margin:0;z-index:999;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.5);transform:translate(${a.left}px,${a.top}px);transition:transform .34s cubic-bezier(.35,.7,.3,1),opacity .34s;`;
+  clone.style.cssText = `position:fixed;left:0;top:0;width:${a.width}px;height:${a.height}px;margin:0;z-index:999;pointer-events:none;box-shadow:0 12px 26px rgba(0,0,0,.55);transform:translate(${a.left}px,${a.top}px);transition:transform .36s cubic-bezier(.34,.8,.3,1);`;
   document.body.appendChild(clone);
   requestAnimationFrame(() => {
-    clone.style.transform = `translate(${b.left}px,${b.top}px) scale(${b.width / a.width}) rotate(7deg)`;
-    clone.style.opacity = "0.55";
+    // Grow to the pile's size and land solid on top of it (the pile re-renders to
+    // this same card underneath, so removing the clone is seamless).
+    clone.style.transform = `translate(${b.left}px,${b.top}px) scale(${b.width / a.width}) rotate(4deg)`;
   });
-  setTimeout(() => clone.remove(), 400);
+  setTimeout(() => clone.remove(), 380);
 }
 
 window.playCard = (id, isEight, el) => {
