@@ -400,6 +400,11 @@ io.on("connection", (socket) => {
   socket.on("host:hello", ({ hostId, code } = {}) => {
     // Resume the same room on a refresh/reconnect if the host identity matches.
     let room = code ? rooms.get((code || "").toUpperCase()) : null;
+    // Fallback: the stored code may be stale/lost, but if we still hold a room
+    // for this host id, reuse it rather than orphaning the players in it.
+    if ((!room || room.hostId !== hostId) && hostId) {
+      for (const r of rooms.values()) { if (r.hostId === hostId) { room = r; break; } }
+    }
     if (room && room.hostId && room.hostId === hostId) {
       room.hostSocketId = socket.id;
       if (room.hostGraceTimer) { clearTimeout(room.hostGraceTimer); room.hostGraceTimer = null; }

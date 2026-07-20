@@ -528,17 +528,23 @@ function ceHostFly(g) {
     const cx = (r) => r.left + r.width / 2 - w / 2, cy = (r) => r.top + r.height / 2 - h / 2;
     // Start scaled to hand-size at the source; grow (play) or shrink (draw) to the target.
     const from = play ? 0.42 : 1, to = play ? 1 : 0.34;
-    clone.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;margin:0;z-index:900;pointer-events:none;box-shadow:0 16px 36px rgba(0,0,0,.6);transform:translate(${cx(a)}px,${cy(a)}px) scale(${from}) rotate(${play ? -16 : 6}deg);opacity:1;transition:transform .46s cubic-bezier(.34,.8,.3,1),opacity .3s ease;`;
+    const dur = play ? 0.6 : 0.5;
+    clone.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;margin:0;z-index:900;pointer-events:none;box-shadow:0 18px 40px rgba(0,0,0,.65);transform:translate(${cx(a)}px,${cy(a)}px) scale(${from}) rotate(${play ? -18 : 6}deg);opacity:1;transition:transform ${dur}s cubic-bezier(.34,.85,.28,1),opacity .3s ease;`;
     document.body.appendChild(clone);
+    // Force the browser to paint the start frame before we change it, so the
+    // transition always runs (a lone rAF can otherwise coalesce the two states).
+    void clone.offsetWidth;
     requestAnimationFrame(() => {
-      clone.style.transform = `translate(${cx(b)}px,${cy(b)}px) scale(${to}) rotate(${play ? 3 : -4}deg)`;
+      clone.style.transform = `translate(${cx(b)}px,${cy(b)}px) scale(${to}) rotate(${play ? 2 : -4}deg)`;
     });
     if (play) {
-      // Land solid — the real pile card (identical) is underneath, so just remove.
-      setTimeout(() => clone.remove(), 500);
+      // Pulse the pile as the card lands, then remove the clone (the real pile
+      // card, identical, is underneath).
+      setTimeout(() => { pileEl.classList.add("ce-land"); }, dur * 1000 - 40);
+      setTimeout(() => { pileEl.classList.remove("ce-land"); clone.remove(); }, dur * 1000 + 340);
     } else {
-      setTimeout(() => { clone.style.opacity = "0"; }, 330);
-      setTimeout(() => clone.remove(), 520);
+      setTimeout(() => { clone.style.opacity = "0"; }, dur * 1000 - 120);
+      setTimeout(() => clone.remove(), dur * 1000 + 60);
     }
   }
 }
