@@ -314,6 +314,7 @@ function renderGame() {
       case "herdMentality": body = viewHerd(g); break;
       case "doodleDash": body = viewDoodle(g); break;
       case "imposter": body = viewImposter(g); break;
+      case "crazyEights": body = viewCrazyEights(g); break;
       default: body = `<div class="center"><h2>Loading…</h2></div>`;
     }
   }
@@ -426,6 +427,35 @@ function viewImposter(g) {
       : `The Imposter escaped! Fooled ${r.fooled}/${r.insiderCount}`}${r.guessedRight ? " · guessed the question! +250" : ""}</div>
     ${leaderboardHTML(g.leaderboard, "Scores")}
   </div>`;
+}
+
+/* ---------------- CRAZY EIGHTS ---------------- */
+function suitColor(s) { return (s === "♥" || s === "♦") ? "var(--red)" : "var(--ink)"; }
+function viewCrazyEights(g) {
+  if (g.screen === "final") {
+    const w = g.standings && g.standings[0];
+    return `<div class="center" style="min-height:auto;gap:22px">
+      <span style="color:var(--purple)">${icon("cards", "status-ic")}</span>
+      <h1 style="font-size:2.6rem">${w ? esc(w.name) + " wins!" : "Game over!"}</h1>
+      ${leaderboardHTML(g.leaderboard, "Final scores")}
+      <button class="btn big teal" onclick="endGame()">Back to games</button>
+    </div>`;
+  }
+  const pop = g.lastAction && g.lastAction.type === "play" ? " ce-pop" : "";
+  return `
+    <div class="ce-turnbar"><span class="pill" style="border:2px solid ${g.turnColor};color:${g.turnColor}">${esc(g.turnName)}'s turn</span>${timerRing(g.timeLeft)}</div>
+    <div class="ce-center">
+      <div class="ce-pile"><div class="ce-label">Deck</div>${cardBack()}<span class="ce-count">${g.pool}</span></div>
+      <div class="ce-pile"><div class="ce-label">Pile</div>${cardFace(g.top, "big" + pop)}<div class="ce-suit" style="color:${suitColor(g.suit)}">Suit ${g.suit}</div></div>
+    </div>
+    <div class="ce-players">
+      ${g.players.map((p) => `
+        <div class="ce-seat ${p.isTurn ? "on" : ""} ${p.cards === 0 ? "out" : ""}">
+          <div class="ce-fan">${Array.from({ length: Math.min(p.cards, 6) }).map(() => cardBack("mini")).join("")}</div>
+          <div class="ce-seatname"><span class="avatar-dot" style="background:${p.color}"></span>${esc(p.name)} <b>${p.cards}</b></div>
+        </div>`).join("")}
+    </div>
+    ${g.log && g.log.length ? `<div class="ce-log">${g.log.map((l) => `<div>${esc(l.text)}</div>`).join("")}</div>` : ""}`;
 }
 
 /* ---------------- WORD HUNT ---------------- */

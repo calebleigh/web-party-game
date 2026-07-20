@@ -6,5 +6,6 @@ import reflexRush from "./reflexRush.js";
 import herdMentality from "./herdMentality.js";
 import doodleDash from "./doodleDash.js";
 import imposter from "./imposter.js";
+import crazyEights from "./crazyEights.js";
 
-export const GAMES = [wordWaterfall, triviaRush, liarLiar, promptParty, reflexRush, herdMentality, doodleDash, imposter];
+export const GAMES = [wordWaterfall, triviaRush, liarLiar, promptParty, reflexRush, herdMentality, doodleDash, imposter, crazyEights];

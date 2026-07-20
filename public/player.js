@@ -259,6 +259,7 @@ function gameBody() {
     case "herdMentality": return pHerd(g);
     case "doodleDash": return pDoodle(g);
     case "imposter": return pImposter(g);
+    case "crazyEights": return pCrazyEights(g);
     default: return `<h2>Loading…</h2>`;
   }
 }
@@ -520,6 +521,32 @@ window.sendImpNumber = () => {
   const el = document.getElementById("impnum");
   if (el && el.value !== "") act({ type: "number", value: el.value });
 };
+
+/* ---------------- CRAZY EIGHTS ---------------- */
+function pCrazyEights(g) {
+  if (g.screen === "final") return finalP(g);
+  const isRed = (s) => s === "♥" || s === "♦";
+  const topHtml = `<div class="ce-top">${cardFace(g.top, "big")}<div class="ce-suit-lbl">Match suit <span style="color:${isRed(g.suit) ? "var(--red)" : "var(--ink)"}">${g.suit}</span></div></div>`;
+  // Clear a stale pending-eight if it's no longer valid.
+  if (window._ce8 && (!g.myTurn || !g.hand.some((c) => c.id === window._ce8))) window._ce8 = null;
+  if (g.myTurn && window._ce8) {
+    return `${topHtml}<p class="player-prompt">You played an 8 — pick the next suit:</p>
+      <div class="ce-suits">${["♠", "♥", "♦", "♣"].map((s) => `<button class="ce-suitbtn ${isRed(s) ? "red" : ""}" onclick="playEightSuit('${s}')">${s}</button>`).join("")}</div>`;
+  }
+  const handHtml = `<div class="ce-hand">${g.hand.map((c) => `<button class="pcard ${isRed(c.suit) ? "red" : "black"} ${c.playable ? "playable" : "dim"}" ${c.playable ? `onclick="playCard('${c.id}',${c.rank === "8"})"` : "disabled"}><span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span></button>`).join("")}</div>`;
+  if (g.myTurn) {
+    return `${topHtml}
+      <p class="player-prompt">Your turn! ${g.canPlay ? "Play a matching card or an 8." : "No match in hand…"}</p>
+      ${handHtml}
+      ${!g.canPlay ? `<button class="btn big purple" onclick="ceDraw()">Draw a card</button>` : ""}`;
+  }
+  return `${topHtml}
+    <p class="muted">Waiting for <b>${esc(g.turnName)}</b> to play…</p>
+    ${handHtml}`;
+}
+window.playCard = (id, isEight) => { if (isEight) { window._ce8 = id; render(); } else act({ type: "play", cardId: id }); };
+window.playEightSuit = (s) => { if (window._ce8) { act({ type: "play", cardId: window._ce8, suit: s }); window._ce8 = null; } };
+window.ceDraw = () => act({ type: "draw" });
 
 /* ---------------- REFLEX ---------------- */
 function pReflex(g) {

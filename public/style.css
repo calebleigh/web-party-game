@@ -811,6 +811,50 @@ body::before {
 .imp-num.imp-is .imp-val { color: var(--red); }
 .imp-votes { font-size: 0.78rem; color: var(--ink-soft); min-width: 52px; text-align: right; }
 
+/* ---- Playing cards (Crazy Eights and future card games) ---- */
+.pcard { position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; width: 54px; height: 76px; border-radius: 8px; background: #fff; color: #1a1030; border: 1.5px solid rgba(0,0,0,0.15); box-shadow: 0 3px 8px rgba(0,0,0,0.35); padding: 5px 6px; font-family: var(--font-display); font-weight: 700; line-height: 1; }
+.pcard.red { color: #d81e4a; }
+.pcard .pc-rank { font-size: 1.05rem; }
+.pcard .pc-suit { font-size: 1.3rem; align-self: flex-end; }
+.pcard.big { width: 92px; height: 130px; padding: 9px 11px; }
+.pcard.big .pc-rank { font-size: 1.9rem; }
+.pcard.big .pc-suit { font-size: 2.5rem; }
+.pcard.back { background: linear-gradient(135deg, var(--purple), #6a3fd0); border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.55); align-items: center; justify-content: center; }
+.pcard.back .pc-back-mark { font-size: 1.6rem; }
+.pcard.mini { width: 26px; height: 38px; border-radius: 5px; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.pcard.mini .pc-back-mark { font-size: 0.85rem; }
+
+/* Crazy Eights — host table */
+.ce-turnbar { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.ce-center { display: flex; align-items: flex-start; justify-content: center; gap: 48px; margin: 10px 0; }
+.ce-pile { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+.ce-label { font-size: 0.8rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+.ce-count { position: absolute; top: 58px; font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; color: #fff; text-shadow: 0 1px 5px rgba(0,0,0,0.7); }
+.ce-suit { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+.pcard.big.ce-pop { animation: cepop 0.4s cubic-bezier(.2,.8,.2,1); }
+@keyframes cepop { 0% { transform: translateY(-44px) rotate(-8deg) scale(.8); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.ce-players { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 6px; }
+.ce-seat { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--panel-line); background: var(--panel-2); }
+.ce-seat.on { border-color: var(--purple); box-shadow: 0 0 18px rgba(169,112,255,0.5); }
+.ce-seat.out { opacity: 0.5; }
+.ce-fan { display: flex; }
+.ce-fan .pcard.mini { margin-left: -14px; }
+.ce-fan .pcard.mini:first-child { margin-left: 0; }
+.ce-seatname { font-family: var(--font-display); font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+.ce-log { margin-top: 8px; font-size: 0.85rem; color: var(--ink-soft); text-align: center; display: flex; flex-direction: column; gap: 2px; }
+
+/* Crazy Eights — player hand */
+.ce-top { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ce-suit-lbl { font-size: 0.95rem; color: var(--ink-soft); }
+.ce-hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0; }
+.ce-hand .pcard { cursor: pointer; transition: transform 0.12s; }
+.ce-hand .pcard.playable { box-shadow: 0 0 0 2px var(--cyan), 0 3px 8px rgba(0,0,0,0.35); }
+.ce-hand .pcard.playable:active { transform: translateY(-4px); }
+.ce-hand .pcard.dim { opacity: 0.45; }
+.ce-suits { display: flex; justify-content: center; gap: 14px; margin: 18px 0; }
+.ce-suitbtn { width: 64px; height: 64px; border-radius: 12px; background: #fff; color: #1a1030; font-size: 2rem; border: 2px solid var(--panel-line); }
+.ce-suitbtn.red { color: #d81e4a; }
+
 /* In-game screens are a fixed stage locked to the viewport so the whole room
  * sees everything at once — content is sized to fit rather than scroll. The
  * lobby and game hubs (which can be taller than the screen) stay scrollable,

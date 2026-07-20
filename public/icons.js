@@ -24,6 +24,7 @@ const ICONS = {
   pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   couch: '<path d="M5 14V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M3 18v-4a2 2 0 0 1 4 0v1h10v-1a2 2 0 0 1 4 0v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M6 19v2"/><path d="M18 19v2"/>',
   mask: '<path d="M3 8h18a1 1 0 0 1 1 1v2a5 5 0 0 1-5 5 4.5 4.5 0 0 1-3.6-1.9 1 1 0 0 0-1.6 0A4.5 4.5 0 0 1 8 16a5 5 0 0 1-5-5V9a1 1 0 0 1 1-1z"/><line x1="7" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/>',
+  cards: '<rect x="9" y="3" width="11" height="16" rx="2"/><path d="M6 7 4.6 8a2 2 0 0 0-1 2.5l3.2 8.8a2 2 0 0 0 2.5 1.2L15 18.4"/>',
 };
 
 function icon(name, cls) {
@@ -42,6 +43,16 @@ function couchFrame() {
   </svg>`;
 }
 
+/* Playing-card face + back, shared by the card games (Crazy Eights, etc.). */
+function cardFace(card, cls) {
+  if (!card) return "";
+  const red = card.suit === "♥" || card.suit === "♦";
+  return `<div class="pcard ${red ? "red" : "black"} ${cls || ""}"><span class="pc-rank">${card.rank}</span><span class="pc-suit">${card.suit}</span></div>`;
+}
+function cardBack(cls) {
+  return `<div class="pcard back ${cls || ""}"><span class="pc-back-mark">♣</span></div>`;
+}
+
 /* Numbered rank badge (gold/silver/bronze for top 3) — replaces medal emoji. */
 function rankBadge(i) {
   return `<span class="rank-badge r${i + 1 <= 3 ? i + 1 : "n"}">${i + 1}</span>`;
@@ -57,6 +68,7 @@ const GAME_ICONS = {
   herdMentality: "players",
   doodleDash: "pencil",
   imposter: "mask",
+  crazyEights: "cards",
 };
 const GAME_COLORS = {
   wordWaterfall: "var(--cyan)",
@@ -67,6 +79,7 @@ const GAME_COLORS = {
   herdMentality: "var(--pink)",
   doodleDash: "var(--blue)",
   imposter: "var(--red)",
+  crazyEights: "var(--purple)",
 };
 
 /* FLIP animation: capture element positions before a re-render, then after the
