@@ -456,6 +456,15 @@ io.on("connection", (socket) => {
     room.endGame();
   });
 
+  // Replay the game that just finished, same players and settings.
+  socket.on("host:playAgain", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || socket.id !== room.hostSocketId || !room.gameId) return;
+    const def = GAMES.find((g) => g.id === room.gameId);
+    if (def && room.activePlayers().length < def.minPlayers) return;
+    room.startGame(room.gameId, room.config || {});
+  });
+
   socket.on("host:kick", ({ playerId }) => {
     const room = rooms.get(socket.data.roomCode);
     if (!room || socket.id !== room.hostSocketId) return;
@@ -502,6 +511,14 @@ io.on("connection", (socket) => {
   socket.on("player:endGame", () => {
     const room = rooms.get(socket.data.roomCode);
     if (isVip(room)) room.endGame();
+  });
+
+  socket.on("player:playAgain", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || !isVip(room) || !room.gameId) return;
+    const def = GAMES.find((g) => g.id === room.gameId);
+    if (def && room.activePlayers().length < def.minPlayers) return;
+    room.startGame(room.gameId, room.config || {});
   });
 
   // ----- PLAYER (a phone) -----

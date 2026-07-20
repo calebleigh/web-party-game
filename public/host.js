@@ -26,11 +26,21 @@ window.toggleOpt = toggleOpt;
 function startGame() { socket.emit("host:startGame"); }
 function backToLobby() { socket.emit("host:backToLobby"); }
 function endGame() { socket.emit("host:endGame"); }
+function playAgain() { socket.emit("host:playAgain"); }
 window.openGame = openGame;
 window.setOpt = setOpt;
 window.startGame = startGame;
 window.backToLobby = backToLobby;
 window.endGame = endGame;
+window.playAgain = playAgain;
+
+/* Shared game-over action buttons: replay the same game, or return to the lobby. */
+function finalActions() {
+  return `<div class="final-actions">
+    <button class="btn big teal" onclick="playAgain()">Play again</button>
+    <button class="btn ghost" onclick="endGame()">Back to games</button>
+  </div>`;
+}
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -400,7 +410,7 @@ function finalScreen(lb) {
     <span style="color:var(--yellow)">${icon("trophy", "status-ic")}</span>
     <h1 style="font-size:3rem">${winnerHeadline(lb, "score")}</h1>
     ${leaderboardHTML(lb, "Final scores")}
-    <button class="btn big teal" onclick="endGame()">Back to games</button>
+    ${finalActions()}
   </div>`;
 }
 
@@ -462,7 +472,7 @@ function viewCrazyEights(g) {
       <span style="color:var(--purple)">${icon("cards", "status-ic")}</span>
       <h1 style="font-size:2.6rem">${w ? esc(w.name) + " wins!" : "Game over!"}</h1>
       ${leaderboardHTML(g.leaderboard, "Final scores")}
-      <button class="btn big teal" onclick="endGame()">Back to games</button>
+      ${finalActions()}
     </div>`;
   }
   const pop = g.lastAction && g.lastAction.type === "play" ? " ce-pop" : "";
@@ -641,7 +651,7 @@ function viewWordFinal(g) {
           <span class="st-total">${s.total}</span>
         </div>`).join("")}
     </div>
-    <button class="btn big teal" onclick="endGame()">Back to games</button>
+    ${finalActions()}
   </div>`;
 }
 

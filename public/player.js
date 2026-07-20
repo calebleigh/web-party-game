@@ -555,6 +555,14 @@ function pCrazyEights(g) {
     return `<button class="pcard ${isRed(c.suit) ? "red" : "black"} ${c.playable ? "playable" : "dim"}" ${tappable ? `onclick="playCard('${c.id}',${c.rank === "8"},this)"` : "disabled"}><span class="pc-rank">${c.rank}</span><span class="pc-suit">${c.suit}</span></button>`;
   }).join("")}</div>`;
 
+  if (g.myTurn && g.resolving) {
+    // Your move landed — brief calm state while the turn passes (no highlights,
+    // no Draw button, hand not tappable).
+    return `${topHtml}
+      <p class="player-prompt">Nice! Passing to the next player…</p>
+      ${handHtml(false)}
+      <div class="ce-action"></div>`;
+  }
   if (g.myTurn) {
     // Playing an 8 — a floating overlay (doesn't reflow the hand) with the suit
     // counts so you can see which suit you hold most of.

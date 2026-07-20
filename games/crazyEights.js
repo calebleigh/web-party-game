@@ -204,14 +204,18 @@ export default {
     }
     const hand = [...state.hands[playerId]].sort((a, b) => (a.suit.localeCompare(b.suit)) || (RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank)));
     const myTurn = state.turnId === playerId;
+    // While a move is resolving (locked, ~before the turn passes) the acting
+    // player shouldn't see playable highlights or a Draw button.
+    const active = myTurn && !state.locked;
     return {
       screen: "play",
       myTurn,
+      resolving: myTurn && !!state.locked,
       turnName: ctx.player(state.turnId)?.name,
       top: state.topCard,
       suit: state.currentSuit,
-      hand: hand.map((c) => ({ ...c, playable: myTurn && playable(c, state.topCard, state.currentSuit) })),
-      canPlay: myTurn && hasPlay(state.hands[playerId], state.topCard, state.currentSuit),
+      hand: hand.map((c) => ({ ...c, playable: active && playable(c, state.topCard, state.currentSuit) })),
+      canPlay: active && hasPlay(state.hands[playerId], state.topCard, state.currentSuit),
     };
   },
 };
