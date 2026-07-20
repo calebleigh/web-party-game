@@ -17,6 +17,24 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DICT = new Set();                     // every valid word (length >= 3)
 const BANKS = { easy: [], medium: [], hard: [] };
 
+// The source dictionary (google-10000 ∩ ENABLE) still contains junk 3-letter
+// entries — names (ben, mae), abbreviations (dev, rec, mil), Greek letters
+// (phi, psi, chi), and obscure/archaic words (asp, gnu, thy, wan, eau). Short
+// words dominate easy boards, so restrict 3-letter answers to this hand-checked
+// list of genuinely common words. (4+ letter words are left as-is.)
+const COMMON3 = new Set(("abs ace act add ads age ago aid aim air all amp and ant any apt arc are arm art ash " +
+  "ask ate bad bag ban bar bat bay bed bee bet bid big bin bio bit bob bow box boy bra bug bus but buy bye cab " +
+  "can cap car cat cod con cop cow cry cup cut dad dam day den did die dig dim dip doc dog don dot dry due duo " +
+  "ear eat egg end era eve eye fan far fat fax fed fee few fig fin fit fix flu fly fog for fox fun fur gap gas " +
+  "gay gel gem get gig got gun guy gym had ham has hat hay her hey him hip his hit hop hot how hub ice ill ink " +
+  "inn ion its jam jar jaw jay jet job jog joy key kid kit lab lap law lay leg let lid lie lip lit log lot low " +
+  "mad man map mat may men met mix mob mod mom mud mug nap net new nod nor not now nut oak odd off oil old one " +
+  "opt our out own pad pal pan par pat paw pay pea pen pet pic pie pig pin pit pod pop pot pro pub put ram ran " +
+  "rap rat raw ray red ref rep rev rib rid rim rip rob rod row rug rub run sad sap sat saw say sea sec see set " +
+  "she sin sip sir sit six ski sky son spa spy sub sue sum sun tab tag tan tap tar tax tea tee ten the tie tin " +
+  "tip toe ton too top toy try tub two use van vat vet via war was wax way web wed wet who why wig win wit won " +
+  "wow yen yes yet you zip zoo").split(" "));
+
 function letterCounts(word) {
   const c = {};
   for (const ch of word) c[ch] = (c[ch] || 0) + 1;
@@ -47,7 +65,8 @@ try {
   const raw = readFileSync(join(__dirname, "data", "common-words.txt"), "utf8");
   const words = raw.split(/\r?\n/)
     .map((w) => w.trim().toLowerCase())
-    .filter((w) => /^[a-z]+$/.test(w) && w.length >= 3);
+    .filter((w) => /^[a-z]+$/.test(w) && w.length >= 3)
+    .filter((w) => w.length !== 3 || COMMON3.has(w)); // drop junk 3-letter words
   for (const w of words) DICT.add(w);
   for (const w of words) {
     const n = w.length;
