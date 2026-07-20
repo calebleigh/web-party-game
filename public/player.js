@@ -136,7 +136,7 @@ function render() {
     const hub = pstate.hub || {};
     body = `<div class="player-body${enter}">${pstate.isVip ? vipHubBody(hub) : nonVipHubBody(hub)}</div>`;
   } else {
-    body = `<div class="player-body${enter}">${gameBody()}</div>`;
+    body = `<div class="player-body${enter} pb-${pstate.gameId}">${gameBody()}</div>`;
   }
   // Preserve whatever the player is typing/tapping across a re-render.
   const active = document.activeElement;
