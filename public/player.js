@@ -3,6 +3,7 @@ const socket = io();
 const app = document.getElementById("app");
 let pstate = null;
 let lastPSig = null;
+let pLobbyView = "main"; // "main" | "cards" — which lobby sub-view this phone shows
 const PALETTE = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#FF7AC6", "#B983FF", "#FF9F45", "#42C2FF", "#F45B69", "#3DDC97"];
 let me = {
   playerId: localStorage.getItem("pb_playerId") || null,
@@ -97,6 +98,7 @@ function renderJoin() {
 /* ---------------- ROUTER ---------------- */
 function render() {
   if (!pstate) return renderJoin();
+  if (pstate.phase !== "lobby") pLobbyView = "main";
   if (pstate.phase === "kicked") { app.innerHTML = notice("x", "You were removed from the game."); localStorage.removeItem("pb_playerId"); me.playerId = null; return; }
   if (pstate.phase === "closed") { app.innerHTML = notice("plug", "The host closed the game."); return; }
   if (!joined && !pstate.me) return renderJoin();
@@ -166,34 +168,53 @@ function render() {
 }
 
 /* ---------------- LOBBY (vote / VIP pick) ---------------- */
+function voteGameTile(g) {
+  const votes = pstate.votes || {};
+  const pc = pstate.playerCount || 0;
+  const isVip = pstate.isVip;
+  const locked = pc < g.minPlayers;
+  const count = votes[g.id] || 0;
+  const mine = pstate.myVote === g.id;
+  const ic = window.GAME_ICONS[g.id] || "grid";
+  const color = window.GAME_COLORS[g.id] || "var(--cyan)";
+  return `<div class="vote-game ${mine ? "voted" : ""} ${locked ? "locked" : ""}">
+    <button class="vg-main" ${locked ? "disabled" : `onclick="voteGame('${g.id}')"`}>
+      <span class="vg-ic" style="color:${color}">${icon(ic)}</span>
+      <span class="vg-name">${esc(g.name)}</span>
+      ${locked ? `<span class="vg-lock">${g.minPlayers}+</span>` : count ? `<span class="vg-votes">${count}</span>` : ""}
+    </button>
+    ${isVip && !locked ? `<button class="vg-setup" onclick="openHubVip('${g.id}')">Set up ▸</button>` : ""}
+  </div>`;
+}
+function voteList(games) {
+  const cards = games.filter((g) => g.category === "cards");
+  const main = games.filter((g) => g.category !== "cards");
+  if (pLobbyView === "cards") {
+    return `<button class="btn ghost" style="align-self:center;margin-bottom:6px" onclick="pLobbyBack()">← All games</button>
+      <div class="vote-games">${cards.map(voteGameTile).join("")}</div>`;
+  }
+  return `<div class="vote-games">
+    ${main.map(voteGameTile).join("")}
+    ${cards.length ? `<div class="vote-game"><button class="vg-main" onclick="openCardHubP()">
+      <span class="vg-ic" style="color:var(--purple)">${icon("cards")}</span>
+      <span class="vg-name">Card Games ▸</span>
+    </button></div>` : ""}
+  </div>`;
+}
 function lobbyBody() {
   const games = pstate.games || [];
-  const votes = pstate.votes || {};
   const isVip = pstate.isVip;
-  const pc = pstate.playerCount || 0;
   return `
-    <h2>${isVip ? "You're the VIP!" : "Vote for a game"}</h2>
-    <p class="muted">${isVip
-      ? "Pick a game to set up — the votes are just below."
-      : `Tap to vote. ${pstate.vipName ? esc(pstate.vipName) : "The VIP"} decides.`}</p>
-    <div class="vote-games">
-      ${games.map((g) => {
-        const locked = pc < g.minPlayers;
-        const count = votes[g.id] || 0;
-        const mine = pstate.myVote === g.id;
-        const ic = window.GAME_ICONS[g.id] || "grid";
-        const color = window.GAME_COLORS[g.id] || "var(--cyan)";
-        return `<div class="vote-game ${mine ? "voted" : ""} ${locked ? "locked" : ""}">
-          <button class="vg-main" ${locked ? "disabled" : `onclick="voteGame('${g.id}')"`}>
-            <span class="vg-ic" style="color:${color}">${icon(ic)}</span>
-            <span class="vg-name">${esc(g.name)}</span>
-            ${locked ? `<span class="vg-lock">${g.minPlayers}+</span>` : count ? `<span class="vg-votes">${count}</span>` : ""}
-          </button>
-          ${isVip && !locked ? `<button class="vg-setup" onclick="openHubVip('${g.id}')">Set up ▸</button>` : ""}
-        </div>`;
-      }).join("")}
-    </div>`;
+    <h2>${pLobbyView === "cards" ? "Card Games" : isVip ? "You're the VIP!" : "Vote for a game"}</h2>
+    <p class="muted">${pLobbyView === "cards"
+      ? "Pick a card game."
+      : isVip
+        ? "Pick a game to set up — the votes are just below."
+        : `Tap to vote. ${pstate.vipName ? esc(pstate.vipName) : "The VIP"} decides.`}</p>
+    ${voteList(games)}`;
 }
+window.openCardHubP = () => { pLobbyView = "cards"; render(); };
+window.pLobbyBack = () => { pLobbyView = "main"; render(); };
 
 function vipHubBody(hub) {
   const options = (hub.options || []).map((opt) => `

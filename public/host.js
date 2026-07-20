@@ -2,6 +2,7 @@
 const socket = io();
 const app = document.getElementById("app");
 let state = null;
+let lobbyView = "main"; // "main" | "cards" — which lobby sub-view the big screen shows
 
 let hostId = localStorage.getItem("pb_hostId") || null;
 let hostCode = localStorage.getItem("pb_hostCode") || null;
@@ -48,6 +49,7 @@ function render() {
   // Only gameplay screens are locked to the viewport (see CSS). Lobby and game
   // hubs may be taller than the screen, so they must stay scrollable.
   document.body.dataset.phase = state.phase;
+  if (state.phase !== "lobby") lobbyView = "main";
   if (state.phase === "lobby") { lastKey = null; return renderLobby(); }
   if (state.phase === "hub") { lastKey = null; return renderHub(); }
   return renderGame();
@@ -125,10 +127,8 @@ function renderLobby() {
 
         ${sessionBoard(players)}
 
-        <h2 style="margin-top:4px">${players.length ? "Vote on your phones — the VIP picks!" : "Choose a game"}</h2>
-        <div class="game-grid">
-          ${(state.games || []).map((g) => gameCard(g, players.length)).join("")}
-        </div>
+        <h2 style="margin-top:4px">${lobbyView === "cards" ? "Card Games" : players.length ? "Vote on your phones — the VIP picks!" : "Choose a game"}</h2>
+        ${lobbyGrid(state.games || [], players.length)}
       </div>
     </div>`;
 }
@@ -177,6 +177,30 @@ function gameCard(g, playerCount) {
     ${g.minPlayers > 1 ? `<p class="muted" style="margin-top:8px">Needs ${g.minPlayers}+ players</p>` : ""}
   </div>`;
 }
+
+/* Lobby grid — general games plus a single "Card Games" tile that opens a
+ * sub-menu of the card games (keeps the lobby tidy as the card hub grows). */
+function lobbyGrid(games, playerCount) {
+  const cards = games.filter((g) => g.category === "cards");
+  const main = games.filter((g) => g.category !== "cards");
+  if (lobbyView === "cards") {
+    return `<div class="game-grid">
+      <div class="game-card gc-back" onclick="lobbyBack()"><span style="color:var(--ink-soft)">${icon("grid", "game-ic")}</span><h3>← All games</h3><p>Back to the full list</p></div>
+      ${cards.map((g) => gameCard(g, playerCount)).join("")}
+    </div>`;
+  }
+  return `<div class="game-grid">
+    ${main.map((g) => gameCard(g, playerCount)).join("")}
+    ${cards.length ? `<div class="game-card" onclick="openCardHub()">
+      <span style="color:var(--purple)">${icon("cards", "game-ic")}</span>
+      <h3>Card Games</h3>
+      <p>Classic card games — Crazy Eights &amp; more</p>
+      <p class="muted" style="margin-top:8px">${cards.length} game${cards.length > 1 ? "s" : ""}</p>
+    </div>` : ""}
+  </div>`;
+}
+window.openCardHub = () => { lobbyView = "cards"; render(); };
+window.lobbyBack = () => { lobbyView = "main"; render(); };
 
 /* ---------------- GAME HUB ---------------- */
 function renderHub() {

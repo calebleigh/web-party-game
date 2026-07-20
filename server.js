@@ -161,6 +161,7 @@ class Room {
         emoji: g.emoji,
         blurb: g.blurb,
         minPlayers: g.minPlayers,
+        category: g.category || null,
       })),
       vipId: this.vipId,
       vipName: (this.vipId && this.players.get(this.vipId)?.name) || null,
@@ -215,7 +216,7 @@ class Room {
       vipName: (this.vipId && this.players.get(this.vipId)?.name) || null,
     };
     if (this.phase === "lobby") {
-      base.games = GAMES.map((g) => ({ id: g.id, name: g.name, blurb: g.blurb, minPlayers: g.minPlayers }));
+      base.games = GAMES.map((g) => ({ id: g.id, name: g.name, blurb: g.blurb, minPlayers: g.minPlayers, category: g.category || null }));
       base.votes = this.voteTally();
       base.myVote = this.votes[playerId] || null;
       base.playerCount = this.activePlayers().length;

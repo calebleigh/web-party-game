@@ -127,6 +127,7 @@ export default {
   emoji: "🎴",
   blurb: "Match the pile by rank or suit — 8s are wild. First to empty their hand wins!",
   minPlayers: 2,
+  category: "cards",
   howTo: [
     "You get a hand of cards on your phone.",
     "On your turn, play a card matching the pile's rank OR suit.",
